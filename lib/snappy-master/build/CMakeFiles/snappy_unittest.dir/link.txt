@@ -1,0 +1,1 @@
+/usr/bin/c++    -rdynamic CMakeFiles/snappy_unittest.dir/snappy_unittest.cc.o CMakeFiles/snappy_unittest.dir/snappy-test.cc.o  -o snappy_unittest libsnappy.a -lz 
