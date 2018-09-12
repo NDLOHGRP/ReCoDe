@@ -1,0 +1,89 @@
+# parameters for running recode
+
+# Data reduction to be used before compressing
+# 1 = Level 1, 2 = Level 2, 3 = Level 3, 4 = Level 4
+Reduction_Level = 1
+
+# rc_operation_mode can be:
+# 0 => reduction only or 
+# 1 => reduction and compression, 
+# there is also a compression only mode, rc_operation_mode = 2 but this is used only for diagnostics
+# Default is rc_operation_mode = 1.
+RC_Operation_Mode = 1
+
+# For the (ij)th pixel the threshold used for dark subtraction is estimated as:
+# the maximum value of the (ij)th pixel across the z frames of the dark noise dataset + Dark_Threshold_Epsilon
+Dark_Threshold_Epsilon = 0
+
+# The bit depth used to store pixel intensity values. Only used for L1 and L2.
+Bit_Depth = 12
+
+# The bit depth of pixel intensity values in the source file.
+# If source file is MRC and the user provided value is -1, the bit depth as per MRC header is used
+# If source file is MRC and the user provided value is not -1, the user specified bit depth is used
+# If source file is not MRC this value must be explicitly provided
+Source_Bit_Depth = 12
+
+# Frame dimensions
+# If source file is MRC, these parameters are read from MRC header, else user provided values are used
+Num_Cols = 4096
+Num_Rows = 512
+
+# Number of frames to extract from dataset i
+# If source file is MRC and the user provided value is -1, the number of frames as per MRC header is used
+# If source file is MRC and the user provided value is not -1, the user specified number of frames are read
+# If source file is not MRC this value has to be explicitly provided
+Num_Frames = 3
+
+# Number of frames to skip in the original data set
+Frame_Offset = 0
+
+# Number of frames to be used for dark noise estimation
+# If source file is MRC and the user provided value is -1, the number of frames as per MRC header is used
+# If source file is MRC and the user provided value is not -1, the user specified number of frames are read
+# If source file is not MRC this value has to be explicitly provided
+Num_Dark_Frames = 1
+
+# Number of frames to skip in the dark noise data set
+Dark_Frame_Offset = 0
+
+# To support multi-threaded reduction-compression, recode first creates multiple part files with extensions .rcX_partYYY where X indicates reduction level and YYY indicates part number
+# These part files are then merged to create the .rcX file
+# This parameter indicates whether the part files should be deleted after the merged .rcX file has been created.
+# 0 = Delete part files, 1 = Keep part files
+Keep_Part_Files = 0
+
+# The number of OMP threads used. Num_Threads = 1 implies no parallelism.
+Num_Threads = 1
+
+# The statistic to be stored for L2
+# 0 = None, 1 = Max, 2 = Mean
+# For L1, L3 and L4 the following parameter is ignored and the value is automatically set to 0
+L2_Statistics = 0
+
+# The centroiding scheme to be used for L4
+# 0 = None, 1 = Weighted Centroids, 2 = Max. Pixel, 3 = Unweighted Centroids
+# For L1, L2 and L3 the following parameter is ignored and the value is automatically set to 0
+L4_Centroiding = 0
+
+# Compression scheme (For forward compatibility only. Currently only gzip is supported and this parameter input is ignored and automatically set to 1.)
+# 0 = gzip, 1 = bzip, 2 = lzma, 3 = snappy, 4 = lz4
+Compression_Scheme = 0
+
+# Compression Rate vs Speed. 
+# Compression_Level = 1 => Fastest Compression; Compression_Level = 9 => Highest Compression (Slowest)
+Compression_Level = 1
+
+# input file type (this parameter is used to identify file header type and size)
+# 0 = Binary, 1 = MRC, 2 = Others
+# the parameter is used to decide the position and size of the original file's header
+# source_file_type = 1 (i.e MRC file), original file's header is pre-fixed to RC header, else original file's header is post-fixed to end of compressed RC data
+Source_File_Type = 0
+
+# input file's header size in bytes 
+# used only if source_file_type is 0 or 2
+# if source_file_type = 1 (i.e MRC file) this input is ignored and header size is automatically set to 1024 bytes
+Source_Header_Length = 0
+
+# A boolean inidcator where 1 indicates the dark noise thresholds are stored as a frame, and 0 indicates they are not stored
+Keep_Dark_Data = 1
