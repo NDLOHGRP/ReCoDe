@@ -36,6 +36,16 @@ bool startsWith(const char *str, const char *pre) {
     return strncmp(pre, str, strlen(pre)) == 0;
 }
 
+bool endsWith(const char *str, const char *suffix) {
+    if (!str || !suffix)
+        return 0;
+    size_t lenstr = strlen(str);
+    size_t lensuffix = strlen(suffix);
+    if (lensuffix >  lenstr)
+        return 0;
+    return strncmp(str + lenstr - lensuffix, suffix, lensuffix) == 0;
+}
+
 void lowercase(char str[]) {
 	int c;
 	while (str[c] != '\0') {
@@ -150,4 +160,14 @@ char *get_filename_sans_extension (char* mystr) {
     // Return the modified string.
 
     return retstr;
+}
+
+// checks if dir ends with a '/' and adds one if it does not
+char *format_directory_path (char* dir) {
+    char path_separator_str[2] = "\0";
+    path_separator_str[0] = PATH_SEPARATOR;
+    if (!endsWith(dir, path_separator_str)) {
+        dir = concat (dir, path_separator_str);
+    }
+    return dir;
 }

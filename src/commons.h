@@ -149,10 +149,10 @@ void loadData (const char* filename, uint16_t *buffer, uint32_t frameStart, uint
 	uint64_t read_count = 0;
 	uint64_t n_elem = 0;
 	
-	printf("nx: %lu\n", d.nx);
-	printf("ny: %lu\n", d.ny);
-	printf("nf: %"PRIu64"\n", n_Frames);
-	printf("iter_c: %"PRIu64"\n", iter_c);
+	recode_print("nx: %lu\n", d.nx);
+	recode_print("ny: %lu\n", d.ny);
+	recode_print("nf: %"PRIu64"\n", n_Frames);
+	recode_print("iter_c: %"PRIu64"\n", iter_c);
 	
 	for (i = 0; i < iter_c; i++) {
 		n_elem = i*chunk_size_pixels;
@@ -162,11 +162,11 @@ void loadData (const char* filename, uint16_t *buffer, uint32_t frameStart, uint
 	read_count += fread(buffer + i*chunk_size_pixels, sizeof(uint16_t), n_pixels_in_frame*rem_sz, fp);
 	fclose(fp);
 	
-	printf("Seek Count: %"PRIu64"\n", seek_count);
-	printf("Read Count: %"PRIu64"\n", read_count);
+	recode_print("Seek Count: %"PRIu64"\n", seek_count);
+	recode_print("Read Count: %"PRIu64"\n", read_count);
 	
 	uint64_t expected_read_count = d.nx*d.ny*n_Frames;
-	printf("Expected Read Count: %"PRIu64"\n", expected_read_count);
+	recode_print("Expected Read Count: %"PRIu64"\n", expected_read_count);
 	
 	if (read_count != expected_read_count) {
 		printf("An unexpected error occurred.\nActual and expected read counts do not match. Exiting.");

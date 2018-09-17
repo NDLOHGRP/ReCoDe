@@ -470,12 +470,12 @@ char* merge_RC1_Parts(const char* folderpath,
 	uint32_t total_frames = 0;
 	uint32_t *process_id_num_frames_map = malloc((num_partfiles)*sizeof(long));
 
-	printf("0\n");
+	//printf("0\n");
 
 	for (i = 0; i<num_partfiles; i++) {
 		
 		FILE *fp = fopen(concat(folderpath, part_filenames[i]), "rb");
-		printf("%s\n", concat(folderpath, part_filenames[i]));
+		recode_print("%s\n", concat(folderpath, part_filenames[i]));
 		
 		fseek(fp, 0, SEEK_END);
 		uint32_t length = ftell(fp);
@@ -487,10 +487,10 @@ char* merge_RC1_Parts(const char* folderpath,
 		
 		fclose(fp);
 		
-		printf("%lu\n", num_frames);
+		recode_print("%lu\n", num_frames);
 	}
 	
-	printf("1\n");
+	//printf("1\n");
 	
 	uint32_t *frame_process_id_map 	= malloc((total_frames)*sizeof(uint32_t));
 	//uint32_t *frame_position_map 	= malloc((total_frames)*sizeof(uint32_t));
@@ -536,7 +536,7 @@ char* merge_RC1_Parts(const char* folderpath,
 		fclose(partFiles[i]);
 	}
 	
-	printf("2\n");
+	//printf("2\n");
 	
 	uint32_t frame_id = 0;
 	/*
@@ -599,7 +599,7 @@ char* merge_RC1_Parts(const char* folderpath,
 	//free(frame_position_map);
 	free(frame_data_sizes_map);
 	
-	printf("111\n");
+	//printf("111\n");
 	
 	clock_t merge_end = clock();
 	float merge_time = (merge_end - merge_start) * 1000.0 / CLOCKS_PER_SEC;
@@ -641,7 +641,7 @@ void decompressExpand_L1 (	const char* compressed_filename,
 	uint32_t n_bytes_in_binary_image 	= ceil((n_pixels_in_frame*1.0) / 8.0);
 	
 	
-	printf("Allocating memory.\n");
+	recode_print("Allocating memory.\n");
 	uint8_t bytes_per_pixel = ceil( ((*header)->bit_depth*1.0) / 8.0 );
 	uint8_t bits_per_pixel 	= bytes_per_pixel * 8;
 	*frameBuffer = (uint16_t*)  malloc ((*header)->nx * (*header)->ny * (*header)->nz * bytes_per_pixel);
@@ -760,9 +760,9 @@ void decompressExpand_L1 (	const char* compressed_filename,
 		*/
 	
 		//printf("bytesRequiredForPacking: %d\n", bytesRequiredForPacking);
-		printf ("n_fg_pixels = %lu\n", fg_pixel_count);
+		recode_print ("n_fg_pixels = %lu\n", fg_pixel_count);
 		
 	}
-	printf(" Done.\n");
+	recode_print("Done.\n");
 }
 

@@ -102,6 +102,7 @@ int de (int argc, char *argv[]) {
 	Decompress-Expand
 	==========================================================================================
 	*/
+    printf("Decompressing and expanding %s ", argv[2]);
 	uint16_t *de_frameBuffer16;
 	RCHeader *de_header = (RCHeader *)malloc(sizeof(RCHeader));
 	decompressExpand_L1 (argv[2], &de_frameBuffer16, &de_header);
@@ -114,11 +115,15 @@ int de (int argc, char *argv[]) {
 	*/
 	char *image_name = getFilenameFromPath (argv[2]);
 	char *s = get_filename_sans_extension (image_name);
-	FILE *fp = fopen (concat(argv[3], concat("Recoded_", s)), "w+");
+    char *outDir = format_directory_path(argv[3]);
+    char *out_fname = concat(outDir, concat("Recoded_", s));
+    
+    printf("to %s\n", out_fname);
+	FILE *fp = fopen (out_fname, "w+");
 	uint32_t n_pixels = de_header->nx * de_header->ny * de_header->nz;
 	fwrite (de_frameBuffer16, sizeof(uint16_t), n_pixels, fp);
 	fclose(fp);
-	
+	printf("Done.\n");
 	
 	/*
 	========================================================================================== 
@@ -156,8 +161,9 @@ int rc (int argc, char *argv[]) {
 		compile_missing_params (mrc_header, &params);
 	}
 	
-	char* darkFile = argv[3];
-	char* imageFile = argv[2];
+	char *darkFile = argv[3];
+	char *imageFile = argv[2];
+    char *outDir = format_directory_path(argv[5]);
 	
 	/*
 	========================================================================================== 
@@ -181,7 +187,7 @@ int rc (int argc, char *argv[]) {
 	uint16_t *frameBuffer = (uint16_t *)malloc(sz_frameBuffer);
 	
 	loadData (imageFile, frameBuffer, header->frame_offset, header->nz, b);
-	printf("Image data loaded.\n");
+	recode_print("Image data loaded.\n");
 	
 	/*
 	========================================================================================== 
@@ -240,7 +246,7 @@ int rc (int argc, char *argv[]) {
 		}
 		
 		frame_start_indices[part_num] = frame_start_index;
-		printf("RCT %d: n_frames_in_thread = %lu, frame_start_index = %lu\n", part_num, n_frames_in_thread[part_num], frame_start_index);
+		recode_print("RCT %d: n_frames_in_thread = %lu, frame_start_index = %lu\n", part_num, n_frames_in_thread[part_num], frame_start_index);
 		frame_start_index += n_frames_in_thread[part_num];
 	}
 	
@@ -257,20 +263,22 @@ int rc (int argc, char *argv[]) {
 	double omp_start = omp_get_wtime();
 	struct timeval start, end;
 	gettimeofday(&start, NULL);
+    
+    printf("Reducing compressing data with %d OpenMP thread(s).\n", params->num_threads);
 
 	#pragma omp parallel for num_threads(params->num_threads)
 	for (part_num = 0; part_num < params->num_threads; part_num++) {
 		
-		printf("RCT %d: NZ = %u\n", part_num, n_frames_in_thread[part_num]);
+		recode_print("RCT %d: NZ = %u\n", part_num, n_frames_in_thread[part_num]);
 		
 		DataSize part_b = { header->nx, header->ny, n_frames_in_thread[part_num], params->source_bit_depth };
 		
 		unsigned long chunk_offset = frame_start_indices[part_num] * part_b.nx * part_b.ny;
 		
-		printf("RCT %d: frame_start_index = %lu, Chunk Offset = %lu\n", part_num, frame_start_indices[part_num], chunk_offset);
+		recode_print("RCT %d: frame_start_index = %lu, Chunk Offset = %lu\n", part_num, frame_start_indices[part_num], chunk_offset);
 		part_filenames[part_num] = reduceCompress_L1 ( 	part_num, 
 														image_name,
-														argv[5],
+														outDir,
 														frameBuffer + chunk_offset, 
 														darkFrame, 
 														frame_start_indices[part_num], 
@@ -279,7 +287,7 @@ int rc (int argc, char *argv[]) {
 														compress_times_sizes_best_speed
 													);		// best speed
 													
-		printf("RCT %d: Reduction Time = %f, Compression Time = %f, Total Time = %f \n", 
+		recode_print("RCT %d: Reduction Time = %f, Compression Time = %f, Total Time = %f \n", 
 				part_num, 
 				compress_times_sizes_best_speed[part_num*2 + 0], 
 				compress_times_sizes_best_speed[part_num*2 + 1], 
@@ -287,6 +295,7 @@ int rc (int argc, char *argv[]) {
 		
 		//logResult (concat("GZIP-S L1_d12 ", "0.7"), compress_times_sizes_best_speed);
 	}
+    printf("Done.\n");
 	
 	double total_time = omp_get_wtime()-omp_start;
 	gettimeofday(&end, NULL);
@@ -299,7 +308,7 @@ int rc (int argc, char *argv[]) {
 	==========================================================================================
 	*/
 	printf("Merging part files.\n");
-	char* fname = merge_RC1_Parts(argv[5], part_filenames, params->num_threads, header, concat(argv[5], image_name));
+	char* fname = merge_RC1_Parts(outDir, part_filenames, params->num_threads, header, concat(outDir, image_name));
 	printf("Done.\n");
 	
 	/*
