@@ -33,7 +33,7 @@ Num_Rows = 512
 # If source file is MRC and the user provided value is -1, the number of frames as per MRC header is used
 # If source file is MRC and the user provided value is not -1, the user specified number of frames are read
 # If source file is not MRC this value has to be explicitly provided
-Num_Frames = 3
+Num_Frames = 1
 
 # Number of frames to skip in the original data set
 Frame_Offset = 0

@@ -116,6 +116,8 @@ float gzip_decompress_stream_2 (uint8_t  compression_level,
 }
 
 
+#if ENABLE_MULTIPLE_COMPRESSIONS
+
 /*
 ========================================================================================== 
 BZIP
@@ -453,8 +455,10 @@ float lz4_decompress_stream   (	uint8_t  compression_level,
 	return process_time;
 }
 
+#endif
 
 
+#if ENABLE_MULTIPLE_COMPRESSIONS
 
 /*
 ========================================================================================== 
@@ -471,12 +475,10 @@ float compress_stream (	uint8_t  compression_scheme,
 	switch (compression_scheme) {
 
 		case 0:
-			//printf("Using Gzip\n");
 			return gzip_compress_stream_2 (data, n_data_bytes, compression_level, n_compressed_bytes, compressedData);
 			break;
 
 		case 1:
-			printf("Using Bzip\n");
 			return bzip2_compress_stream (data, n_data_bytes, compression_level, n_compressed_bytes, compressedData);
 			break;
 
@@ -485,7 +487,6 @@ float compress_stream (	uint8_t  compression_scheme,
 			break;
 
 		case 3:
-			//return lzma_compress_stream (data, n_data_bytes, compression_level, n_compressed_bytes, compressedData);
 			return snappy_compress_stream (data, n_data_bytes, compression_level, n_compressed_bytes, compressedData);
 			break;
 
@@ -504,7 +505,7 @@ float compress_stream (	uint8_t  compression_scheme,
 
 /*
 ========================================================================================== 
-Main Deompression Entry Point
+Main Decompression Entry Point
 ========================================================================================== 
 */
 float decompress_stream (	uint8_t  compression_scheme,
@@ -530,7 +531,6 @@ float decompress_stream (	uint8_t  compression_scheme,
 
 		case 3:
 			return snappy_decompress_stream (compression_level, compressedData, deCompressedData, nCompressedLen, nDataLen);
-			//return lzma_decompress_stream (compression_level, compressedData, deCompressedData, nCompressedLen, nDataLen);
 			break;
 
 		case 4:
@@ -544,4 +544,59 @@ float decompress_stream (	uint8_t  compression_scheme,
 
 }
 
+#else
+	
+/*
+========================================================================================== 
+Main Compression Entry Point
+========================================================================================== 
+*/
+float compress_stream (	uint8_t  compression_scheme,
+						uint8_t  compression_level,
+						uint8_t  *data, 
+						uint32_t n_data_bytes, 
+						uint32_t *n_compressed_bytes, 
+						uint8_t  *compressedData) {
+	
+	switch (compression_scheme) {
+
+		case 0:
+			return gzip_compress_stream_2 (data, n_data_bytes, compression_level, n_compressed_bytes, compressedData);
+			break;
+
+		default:
+			return gzip_compress_stream_2 (data, n_data_bytes, compression_level, n_compressed_bytes, compressedData);
+			break;
+
+	}
+
+}
+
+
+/*
+========================================================================================== 
+Main Decompression Entry Point
+========================================================================================== 
+*/
+float decompress_stream (	uint8_t  compression_scheme,
+							uint8_t  compression_level,
+							uint8_t  *compressedData, 
+							uint8_t  *deCompressedData, 
+							uint32_t nCompressedLen, 
+							uint32_t nDataLen) {
+
+	switch(compression_scheme) {
+		
+		case 0:
+			return gzip_decompress_stream_2 (compression_level, compressedData, deCompressedData, nCompressedLen, nDataLen);
+			break;
+
+		default:
+			return gzip_decompress_stream_2 (compression_level, compressedData, deCompressedData, nCompressedLen, nDataLen);
+			break;
+	}
+
+}
+
+#endif
 
