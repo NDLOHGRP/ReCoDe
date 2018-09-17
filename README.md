@@ -21,4 +21,8 @@ To decompress and expand use the following command:<br>
 <b>./recode -de &lt;recode filename&gt; &lt;output directory&gt;</b><br>
 E.g.: ./recode -de scratch/Frame_0_12-13-59.436.bin.rc1 scratch/<br>
   
+<<<<<<< HEAD
 In the first example the "config/recode_params.txt" file specifies the reduction compression parameters, such as reduction level, number of OpenMP threads used etc.
+=======
+In the first example the "config/recode_params.txt" file specifies the reduction compression parameters, such as reduction level, number of OpenMP threads used etc.
+>>>>>>> origin/master
