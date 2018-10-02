@@ -36,7 +36,11 @@ to run:		export OMP_NUM_THREADS=11
 #include "lz4.h"
 #endif
 
-#include <dirent.h>
+#ifdef _WIN32
+	#include <win32\dirent.h>
+#else
+	#include <dirent.h>
+#endif
 
 #include "recodefs.h"
 #include "recode_utils.h"
@@ -303,7 +307,6 @@ int rc (int argc, char *argv[]) {
 	Clean-up
 	==========================================================================================
 	*/
-	free(params);
 	free(header);
     free(darkFrame);
 	free(frameBuffer);
@@ -312,8 +315,9 @@ int rc (int argc, char *argv[]) {
 	for (part_num = 0; part_num < params->num_threads; part_num++) {
 		free(part_filenames[part_num]);
 	}
+	free(params);
     free(compress_times_sizes_best_speed);
-	//free(part_filenames);
+	free(part_filenames);
 
 	return 0;
 }

@@ -24,10 +24,11 @@ char* makePartFilename(unsigned char process_id, const char *original_filename, 
 		x = ".rcX_part";
 	}
 	
-	char* part_num = (char*)malloc(sizeof(char)*3);
+	char part_num[4];
 	sprintf(part_num, "%03d", process_id);
 	char* filename = concat(concat(original_filename, x), part_num);
-	free(part_num);
+	//char* filename = ".rc1_part000";
+	//free(part_num);
 	return filename;
 }
 
@@ -47,7 +48,7 @@ bool endsWith(const char *str, const char *suffix) {
 }
 
 void lowercase(char str[]) {
-	int c;
+	int c = 0;
 	while (str[c] != '\0') {
 		if (str[c] >= 'A' && str[c] <= 'Z') {
 			str[c] = str[c] + 32;
@@ -98,7 +99,7 @@ char *trim(char *str) {
 int strcmp_ignore_case (char *a, char *b) {
 	lowercase(a);
 	lowercase(b);
-	int c;
+	int c = 0;
     while (a[c] != '\0' && b[c] != '\0') {
         if (a[c] != b[c]) {
 			return 0;
