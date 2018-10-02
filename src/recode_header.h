@@ -194,8 +194,8 @@ void create_recode_header (InputParams *input_params, uint8_t id, uint8_t *sourc
 		(*header)->source_header_position	= SOURCE_HEADER_POSITION_POST;
 	}
 	
-	strncpy ((*header)->source_file_name, 	source_name, 100);
-	strncpy ((*header)->dark_file_name, 	dark_name, 	 100);
+	strncpy ((char*)(*header)->source_file_name, (const char*)source_name, 100);
+	strncpy ((char*)(*header)->dark_file_name, (const char*)dark_name, 	 100);
 	
 	(*header)->dark_threshold_epsilon 	= input_params->dark_threshold_epsilon;
 	(*header)->has_dark_data 			= input_params->keep_dark_data;

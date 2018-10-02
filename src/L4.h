@@ -289,7 +289,7 @@ char* reduceCompress_L4 (uint8_t	 process_id,
 		float 	 *y_coor 			 		= (float *) malloc  (n_pixels_in_frame * sizeof(float));
 		uint16_t *foregroundImage 	 		= (uint16_t *)calloc(n_pixels_in_frame, sizeof(uint16_t));
 		uint8_t  *centroidImage 			= (uint8_t *)calloc (n_bytes_in_binary_image, 1);			// allocated max space - where all pixels are fg pixels, must calloc to init to 0
-		uint8_t  *foregroundTernaryMap 		= (int8_t *)calloc  (n_pixels_in_frame, sizeof(int8_t));
+		int8_t  *foregroundTernaryMap 		= (int8_t *)calloc  (n_pixels_in_frame, sizeof(int8_t));
 		uint8_t  *compressedCentroidImage	= (uint8_t*) malloc (n_pixels_in_frame * sizeof(uint8_t));
 	
 		// create part file

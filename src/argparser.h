@@ -73,7 +73,7 @@ typedef struct {
 
 
 
-get_input_params (const char* argfilename, InputParams **params) {
+void get_input_params (const char* argfilename, InputParams **params) {
 	
 	FILE *fp = fopen ( argfilename, "r" );
 	if ( fp != NULL ) {
@@ -208,14 +208,14 @@ get_input_params (const char* argfilename, InputParams **params) {
 	
 }
 
-compile_missing_params (MRCHeader *mrc_header, InputParams **params) {
+void compile_missing_params (MRCHeader *mrc_header, InputParams **params) {
 	
 	if ((*params)->source_file_type == 1) {
-		(*params)->num_cols 				= mrc_header->nx;
-		(*params)->num_rows 				= mrc_header->ny;
-		(*params)->source_bit_depth 		= mrc_header->bit_depth;
+		(*params)->num_cols 				= mrc_header->dimensions[0];
+		(*params)->num_rows 				= mrc_header->dimensions[1];
+		(*params)->source_bit_depth 		= getBitDepth (mrc_header);
 		if ((*params)->num_frames == -1) {
-			(*params)->num_frames			= mrc_header->nz;
+			(*params)->num_frames			= mrc_header->dimensions[2];
 		}
 		(*params)->source_header_length 	= 1024;
 	}
@@ -223,7 +223,7 @@ compile_missing_params (MRCHeader *mrc_header, InputParams **params) {
 }
 
 
-print_params (InputParams *params) {
+void print_params (InputParams *params) {
 	printf("Reduction Level: %d\n", params->reduction_level);
 	printf("Num. Dark Frames: %d\n", params->num_dark_frames);
 	printf("Dark Frame Offset: %d\n", params->dark_frame_offset);
@@ -234,13 +234,13 @@ print_params (InputParams *params) {
 
 int validate_input_params (InputParams *input_params, uint8_t *source_name, uint8_t *dark_name) {
 	
-	if (strlen(source_name) > (MAX_FILENAME_LENGTH-1)) {
+	if (strlen((const char*)source_name) > (MAX_FILENAME_LENGTH-1)) {
 		printf("Source filename must be less than 100 characters long.\n");
 		printf("Unable to continue.\n");
 		exit(0);
 	}
 	
-	if (strlen(dark_name) > (MAX_FILENAME_LENGTH-1)) {
+	if (strlen((const char*)dark_name) > (MAX_FILENAME_LENGTH-1)) {
 		printf("Dark filename must be less than 100 characters long.\n");
 		printf("Unable to continue.\n");
 		exit(0);

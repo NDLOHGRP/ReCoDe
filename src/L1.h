@@ -457,10 +457,9 @@ char* reduceCompress_L1 (uint8_t	 process_id,
 
 char* merge_RC1_Parts(const char* folderpath, 
 					 char** 	 part_filenames, 
-					 int 		 num_partfiles, 
+					 const int 		 num_partfiles, 
 					 RCHeader 	 *rcHeader, 
 					 const char  *compressed_filename) {
-	
 	
 	clock_t merge_start = clock();
 	
@@ -468,7 +467,7 @@ char* merge_RC1_Parts(const char* folderpath,
 	
 	uint32_t num_frames;
 	uint32_t total_frames = 0;
-	uint32_t *process_id_num_frames_map = malloc((num_partfiles)*sizeof(long));
+	uint32_t *process_id_num_frames_map = (uint32_t*)malloc((num_partfiles)*sizeof(long));
 
 	//printf("0\n");
 
@@ -492,11 +491,13 @@ char* merge_RC1_Parts(const char* folderpath,
 	
 	//printf("1\n");
 	
-	uint32_t *frame_process_id_map 	= malloc((total_frames)*sizeof(uint32_t));
+	uint32_t *frame_process_id_map 	= (uint32_t*)malloc((total_frames)*sizeof(uint32_t));
 	//uint32_t *frame_position_map 	= malloc((total_frames)*sizeof(uint32_t));
-	uint32_t *frame_data_sizes_map 	= malloc((total_frames)*sizeof(uint32_t)*3);
+	uint32_t *frame_data_sizes_map 	= (uint32_t*)malloc((total_frames)*sizeof(uint32_t)*3);
+
+	FILE **partFiles = (FILE**)malloc((num_partfiles)*sizeof(FILE*));
 	
-	FILE *partFiles[num_partfiles];
+	//FILE *partFiles[num_partfiles];
 	for (i = 0; i<num_partfiles; i++) {
 		
 		partFiles[i] = fopen(concat(folderpath, part_filenames[i]), "rb");
@@ -605,7 +606,7 @@ char* merge_RC1_Parts(const char* folderpath,
 	float merge_time = (merge_end - merge_start) * 1000.0 / CLOCKS_PER_SEC;
 	printf("Merge Time: %f\n", merge_time);
 	
-	return compressed_filename;
+	return (char*)compressed_filename;
 }
 
 
@@ -621,7 +622,7 @@ void decompressExpand_L1 (	const char* compressed_filename,
 	
 	// read compressed data lengths
 	uint32_t frame_id = 0;
-	uint32_t *frame_data_sizes_map 	= malloc(((*header)->nz)*sizeof(uint32_t)*3);
+	uint32_t *frame_data_sizes_map 	= (uint32_t *)malloc(((*header)->nz)*sizeof(uint32_t)*3);
 	for (frame_id = 0; frame_id < (*header)->nz; frame_id++) {
 		fread (&frame_data_sizes_map[frame_id*3], 	sizeof(uint32_t), 1, fp);
 		fread (&frame_data_sizes_map[frame_id*3+1], sizeof(uint32_t), 1, fp);

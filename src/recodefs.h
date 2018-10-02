@@ -14,7 +14,8 @@
 
 #define VERBOSITY 0
 
-#define recode_print(format,args...)      \
-                  if (VERBOSITY == 1) {       \ 
-                      printf(format, ## args); \
-                  }
+#ifdef _WIN32
+	#define recode_print(format,...) if (VERBOSITY == 1) { printf(format, __VA_ARGS__); }
+#else
+	#define recode_print(format,args...) if (VERBOSITY == 1) { printf(format, ## args); }
+#endif

@@ -61,32 +61,7 @@ to run:		export OMP_NUM_THREADS=11
 #include "L4.h"
 
 
-int main(int argc, char *argv[]) {
-	
-	if (argc < 2) {
-		
-		printf("Failed to initialize. Expected 3 or 5 arguments, but found %d\n", argc-1);
-		fprintf(stderr, "Usage::\n");
-		fprintf(stderr, "./recode -rc <input image filename> <dark image filename> <input parameter filename> <output directory>\n");
-		fprintf(stderr, "./recode -de <recode filename> <output directory>\n");
-		exit(0);
-		
-	} else {
-	
-		if (strcmp_ignore_case(argv[1], "-rc")) {
-			rc (argc, argv) ;
-		} else if (strcmp_ignore_case(argv[1], "-de")) {
-			de (argc, argv) ;
-		} else {
-			printf("Failed to initialize. Unknown mode: %s. Acceptable modes are: -rc and -de", argv[1]);
-			fprintf(stderr, "Usage::\n");
-			fprintf(stderr, "./recode -rc <input image filename> <dark image filename> <input parameter filename> <output directory>\n");
-			fprintf(stderr, "./recode -de <recode filename> <output directory>\n");
-			exit(0);
-		} 
-	
-	}
-}
+
 
 int de (int argc, char *argv[]) {
 	
@@ -180,8 +155,8 @@ int rc (int argc, char *argv[]) {
 	==========================================================================================
 	*/
 	RCHeader *header = (RCHeader *)malloc(sizeof(RCHeader));
-	char *image_name = getFilenameFromPath (imageFile);
-	char *dark_name = getFilenameFromPath (darkFile);
+	uint8_t *image_name = (uint8_t*)getFilenameFromPath (imageFile);
+	uint8_t *dark_name = (uint8_t*)getFilenameFromPath (darkFile);
 	create_recode_header (params, -1, image_name, dark_name, &header);
 	print_recode_header (header);
 
@@ -270,8 +245,10 @@ int rc (int argc, char *argv[]) {
 	unsigned long nz;
 	
 	double omp_start = omp_get_wtime();
-	struct timeval start, end;
-	gettimeofday(&start, NULL);
+	//struct timeval start, end;
+	//gettimeofday(&start, NULL);
+
+	double start = _gettimeofday();
     
     printf("Reducing compressing data with %d OpenMP thread(s).\n", params->num_threads);
 
@@ -286,7 +263,7 @@ int rc (int argc, char *argv[]) {
 		
 		recode_print("RCT %d: frame_start_index = %lu, Chunk Offset = %lu\n", part_num, frame_start_indices[part_num], chunk_offset);
 		part_filenames[part_num] = reduceCompress_L1 ( 	part_num, 
-														image_name,
+														(const char*)image_name,
 														outDir,
 														frameBuffer + chunk_offset, 
 														darkFrame, 
@@ -307,8 +284,9 @@ int rc (int argc, char *argv[]) {
     printf("Done.\n");
 	
 	double total_time = omp_get_wtime()-omp_start;
-	gettimeofday(&end, NULL);
-	double delta = ((end.tv_sec  - start.tv_sec) * 1000000u + end.tv_usec - start.tv_usec) / 1.e6;
+	//gettimeofday(&end, NULL);
+	double end = _gettimeofday();
+	double delta = ((end  - start) * 1000000u + end - start) / 1.e6;
 	printf("Wall Time: %f, Total OMP Time: %f, Effective Avg. Time per Frame: %f\n", delta, total_time, total_time/(part_num*1.0));
 	
 	/*
@@ -317,7 +295,7 @@ int rc (int argc, char *argv[]) {
 	==========================================================================================
 	*/
 	printf("Merging part files.\n");
-	char* fname = merge_RC1_Parts(outDir, part_filenames, params->num_threads, header, concat(outDir, image_name));
+	char* fname = merge_RC1_Parts(outDir, part_filenames, params->num_threads, header, concat(outDir, (const char*)image_name));
 	printf("Done.\n");
 	
 	/*
@@ -338,4 +316,34 @@ int rc (int argc, char *argv[]) {
 	//free(part_filenames);
 
 	return 0;
+}
+
+int main(int argc, char *argv[]) {
+
+	if (argc < 2) {
+
+		printf("Failed to initialize. Expected 3 or 5 arguments, but found %d\n", argc - 1);
+		fprintf(stderr, "Usage::\n");
+		fprintf(stderr, "./recode -rc <input image filename> <dark image filename> <input parameter filename> <output directory>\n");
+		fprintf(stderr, "./recode -de <recode filename> <output directory>\n");
+		exit(0);
+
+	}
+	else {
+
+		if (strcmp_ignore_case(argv[1], "-rc")) {
+			rc(argc, argv);
+		}
+		else if (strcmp_ignore_case(argv[1], "-de")) {
+			de(argc, argv);
+		}
+		else {
+			printf("Failed to initialize. Unknown mode: %s. Acceptable modes are: -rc and -de", argv[1]);
+			fprintf(stderr, "Usage::\n");
+			fprintf(stderr, "./recode -rc <input image filename> <dark image filename> <input parameter filename> <output directory>\n");
+			fprintf(stderr, "./recode -de <recode filename> <output directory>\n");
+			exit(0);
+		}
+
+	}
 }

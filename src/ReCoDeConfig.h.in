@@ -1,0 +1,3 @@
+// the configured options and settings for ReCoDe
+#define ReCoDe_VERSION_MAJOR @ReCoDe_VERSION_MAJOR@
+#define ReCoDe_VERSION_MINOR @ReCoDe_VERSION_MINOR@

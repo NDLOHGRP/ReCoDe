@@ -24,7 +24,7 @@ char* makePartFilename(unsigned char process_id, const char *original_filename, 
 		x = ".rcX_part";
 	}
 	
-	char* part_num = malloc(sizeof(char)*3);
+	char* part_num = (char*)malloc(sizeof(char)*3);
 	sprintf(part_num, "%03d", process_id);
 	char* filename = concat(concat(original_filename, x), part_num);
 	free(part_num);
@@ -70,7 +70,7 @@ char* getFilenameFromPath (char *filepath) {
 
 	// extract filename from file path
 	int len = strlen(pdest);
-	char *inpfile = malloc(len+1);		// Make space for the zero.
+	char *inpfile = (char*)malloc(len+1);		// Make space for the zero.
 	strncpy(inpfile, pdest, len+1);		// Copy including zero. 
 	return inpfile;
 }
@@ -130,7 +130,7 @@ char *get_filename_sans_extension (char* mystr) {
 
     if (mystr == NULL)
         return NULL;
-    if ((retstr = malloc (strlen (mystr) + 1)) == NULL)
+    if ((retstr = (char*)malloc (strlen (mystr) + 1)) == NULL)
         return NULL;
 
     // Make a copy and find the relevant characters.
@@ -170,4 +170,8 @@ char *format_directory_path (char* dir) {
         dir = concat (dir, path_separator_str);
     }
     return dir;
+}
+
+double _gettimeofday() {
+	return 0.0;
 }

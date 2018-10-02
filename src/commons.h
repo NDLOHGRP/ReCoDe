@@ -174,8 +174,6 @@ void loadData (const char* filename, uint16_t *buffer, uint32_t frameStart, uint
 	}
 }
 
-
-
 // Used in L4 and L2
 float get_foreground_image (uint16_t *frameBuffer, 
 							uint16_t *darkBuffer, 
