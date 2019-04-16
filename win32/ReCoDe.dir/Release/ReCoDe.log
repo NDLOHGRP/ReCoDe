@@ -1,0 +1,140 @@
+﻿  recode.cpp
+D:\cbis\GitHub\ReCoDe\include\win32\dirent.h(1102): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+D:\cbis\GitHub\ReCoDe\include\win32\dirent.h(1185): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+d:\cbis\github\recode\src\initparser.h(151): error C2664: 'int wchar_to_int(wchar_t *)': cannot convert argument 1 from 'char *' to 'wchar_t *'
+  d:\cbis\github\recode\src\initparser.h(151): note: Types pointed to are unrelated; conversion requires reinterpret_cast, C-style cast or function-style cast
+d:\cbis\github\recode\src\initparser.h(154): error C2664: 'char *wchar_to_char(wchar_t *)': cannot convert argument 1 from 'char *' to 'wchar_t *'
+  d:\cbis\github\recode\src\initparser.h(154): note: Types pointed to are unrelated; conversion requires reinterpret_cast, C-style cast or function-style cast
+d:\cbis\github\recode\src\initparser.h(157): error C2664: 'char *wchar_to_char(wchar_t *)': cannot convert argument 1 from 'char *' to 'wchar_t *'
+  d:\cbis\github\recode\src\initparser.h(157): note: Types pointed to are unrelated; conversion requires reinterpret_cast, C-style cast or function-style cast
+d:\cbis\github\recode\src\initparser.h(160): error C2664: 'char *wchar_to_char(wchar_t *)': cannot convert argument 1 from 'char *' to 'wchar_t *'
+  d:\cbis\github\recode\src\initparser.h(160): note: Types pointed to are unrelated; conversion requires reinterpret_cast, C-style cast or function-style cast
+d:\cbis\github\recode\src\initparser.h(163): error C2664: 'char *wchar_to_char(wchar_t *)': cannot convert argument 1 from 'char *' to 'wchar_t *'
+  d:\cbis\github\recode\src\initparser.h(163): note: Types pointed to are unrelated; conversion requires reinterpret_cast, C-style cast or function-style cast
+d:\cbis\github\recode\src\initparser.h(166): error C2664: 'char *wchar_to_char(wchar_t *)': cannot convert argument 1 from 'char *' to 'wchar_t *'
+  d:\cbis\github\recode\src\initparser.h(166): note: Types pointed to are unrelated; conversion requires reinterpret_cast, C-style cast or function-style cast
+d:\cbis\github\recode\src\initparser.h(169): error C2664: 'char *wchar_to_char(wchar_t *)': cannot convert argument 1 from 'char *' to 'wchar_t *'
+  d:\cbis\github\recode\src\initparser.h(169): note: Types pointed to are unrelated; conversion requires reinterpret_cast, C-style cast or function-style cast
+d:\cbis\github\recode\src\initparser.h(172): error C2664: 'int wchar_to_int(wchar_t *)': cannot convert argument 1 from 'char *' to 'wchar_t *'
+  d:\cbis\github\recode\src\initparser.h(172): note: Types pointed to are unrelated; conversion requires reinterpret_cast, C-style cast or function-style cast
+d:\cbis\github\recode\src\initparser.h(213): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 1 has type 'int64_t'
+  d:\cbis\github\recode\src\initparser.h(213): note: consider using '%lld' in the format string
+  d:\cbis\github\recode\src\initparser.h(213): note: consider using '%Id' in the format string
+  d:\cbis\github\recode\src\initparser.h(213): note: consider using '%I64d' in the format string
+d:\cbis\github\recode\src\recode_utils.h(80): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+d:\cbis\github\recode\src\mrchandler.h(123): warning C4244: 'argument': conversion from 'uint64_t' to 'long', possible loss of data
+d:\cbis\github\recode\src\mrchandler.h(128): warning C4244: 'argument': conversion from 'uint64_t' to 'double', possible loss of data
+d:\cbis\github\recode\src\mrchandler.h(128): warning C4244: 'initializing': conversion from 'double' to 'uint64_t', possible loss of data
+d:\cbis\github\recode\src\mrchandler.h(134): warning C4477: 'printf' : format string '%lu' requires an argument of type 'unsigned long', but variadic argument 1 has type 'uint64_t'
+  d:\cbis\github\recode\src\mrchandler.h(134): note: consider using '%llu' in the format string
+  d:\cbis\github\recode\src\mrchandler.h(134): note: consider using '%Iu' in the format string
+  d:\cbis\github\recode\src\mrchandler.h(134): note: consider using '%I64u' in the format string
+d:\cbis\github\recode\src\mrchandler.h(135): warning C4477: 'printf' : format string '%lu' requires an argument of type 'unsigned long', but variadic argument 1 has type 'uint64_t'
+  d:\cbis\github\recode\src\mrchandler.h(135): note: consider using '%llu' in the format string
+  d:\cbis\github\recode\src\mrchandler.h(135): note: consider using '%Iu' in the format string
+  d:\cbis\github\recode\src\mrchandler.h(135): note: consider using '%I64u' in the format string
+d:\cbis\github\recode\src\commons.h(10): warning C4477: 'printf' : format string '%lu' requires an argument of type 'unsigned long', but variadic argument 1 has type 'uint64_t'
+  d:\cbis\github\recode\src\commons.h(10): note: consider using '%llu' in the format string
+  d:\cbis\github\recode\src\commons.h(10): note: consider using '%Iu' in the format string
+  d:\cbis\github\recode\src\commons.h(10): note: consider using '%I64u' in the format string
+d:\cbis\github\recode\src\commons.h(127): warning C4244: 'argument': conversion from 'uint64_t' to 'long', possible loss of data
+d:\cbis\github\recode\src\commons.h(132): warning C4244: 'argument': conversion from 'uint64_t' to 'double', possible loss of data
+d:\cbis\github\recode\src\commons.h(132): warning C4244: 'initializing': conversion from 'double' to 'uint64_t', possible loss of data
+d:\cbis\github\recode\src\commons.h(138): warning C4477: 'printf' : format string '%lu' requires an argument of type 'unsigned long', but variadic argument 1 has type 'uint64_t'
+  d:\cbis\github\recode\src\commons.h(138): note: consider using '%llu' in the format string
+  d:\cbis\github\recode\src\commons.h(138): note: consider using '%Iu' in the format string
+  d:\cbis\github\recode\src\commons.h(138): note: consider using '%I64u' in the format string
+d:\cbis\github\recode\src\commons.h(139): warning C4477: 'printf' : format string '%lu' requires an argument of type 'unsigned long', but variadic argument 1 has type 'uint64_t'
+  d:\cbis\github\recode\src\commons.h(139): note: consider using '%llu' in the format string
+  d:\cbis\github\recode\src\commons.h(139): note: consider using '%Iu' in the format string
+  d:\cbis\github\recode\src\commons.h(139): note: consider using '%I64u' in the format string
+d:\cbis\github\recode\src\commons.h(140): warning C4477: 'printf' : format string '%llu' requires an argument of type 'unsigned __int64', but variadic argument 1 has type 'uint32_t'
+  d:\cbis\github\recode\src\commons.h(140): note: consider using '%u' in the format string
+  d:\cbis\github\recode\src\commons.h(140): note: consider using '%I32u' in the format string
+d:\cbis\github\recode\src\commons.h(177): error C2065: 'SEQHeader': undeclared identifier
+d:\cbis\github\recode\src\commons.h(177): error C2065: 'seq_header': undeclared identifier
+d:\cbis\github\recode\src\commons.h(177): error C2059: syntax error: ')'
+d:\cbis\github\recode\src\commons.h(178): error C2065: 'seq_header': undeclared identifier
+d:\cbis\github\recode\src\commons.h(178): error C3861: 'getSEQHeader': identifier not found
+d:\cbis\github\recode\src\commons.h(180): error C2065: 'seq_header': undeclared identifier
+d:\cbis\github\recode\src\commons.h(180): error C3861: 'getSEQFrames': identifier not found
+d:\cbis\github\recode\src\commons.h(221): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\commons.h(241): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+d:\cbis\github\recode\src\compressor.h(68): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+d:\cbis\github\recode\src\compressor.h(112): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+d:\cbis\github\recode\src\fileutils.h(90): warning C4244: 'initializing': conversion from 'uint64_t' to 'long', possible loss of data
+d:\cbis\github\recode\src\argparser.h(26): warning C4244: '=': conversion from 'unsigned short' to 'unsigned char', possible loss of data
+d:\cbis\github\recode\src\L1.h(29): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(66): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+d:\cbis\github\recode\src\L1.h(87): warning C4244: 'initializing': conversion from 'double' to 'unsigned short', possible loss of data
+d:\cbis\github\recode\src\L1.h(94): warning C4018: '<': signed/unsigned mismatch
+d:\cbis\github\recode\src\L1.h(117): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+d:\cbis\github\recode\src\L1.h(146): warning C4244: 'initializing': conversion from 'uint64_t' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(152): warning C4244: '=': conversion from 'double' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(179): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(240): warning C4476: 'printf' : unknown type field character '(' in format specifier
+d:\cbis\github\recode\src\L1.h(251): warning C4476: 'printf' : unknown type field character '(' in format specifier
+d:\cbis\github\recode\src\L1.h(282): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(375): warning C4244: 'initializing': conversion from 'uint64_t' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(376): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(382): warning C4244: 'argument': conversion from 'double' to 'std::size_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(384): warning C4244: 'argument': conversion from 'double' to 'std::size_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(415): warning C4244: 'argument': conversion from 'unsigned short' to 'uint8_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(506): warning C4018: '<': signed/unsigned mismatch
+d:\cbis\github\recode\src\L1.h(604): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+d:\cbis\github\recode\src\L1.h(640): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(644): warning C4244: 'initializing': conversion from 'double' to 'uint8_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(653): warning C4244: '=': conversion from 'double' to 'uint64_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(725): warning C4244: '+=': conversion from 'uint64_t' to 'uint16_t', possible loss of data
+d:\cbis\github\recode\src\L2.h(40): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L2.h(41): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L2.h(42): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L2.h(48): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L2.h(49): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L2.h(50): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L2.h(98): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L2.h(116): warning C4018: '<': signed/unsigned mismatch
+d:\cbis\github\recode\src\L2.h(120): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L2.h(138): warning C4244: '/=': conversion from 'double' to 'float', possible loss of data
+d:\cbis\github\recode\src\L2.h(139): warning C4244: '/=': conversion from 'double' to 'float', possible loss of data
+d:\cbis\github\recode\src\L2.h(164): warning C4018: '<': signed/unsigned mismatch
+d:\cbis\github\recode\src\L2.h(216): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L2.h(226): warning C4244: 'initializing': conversion from 'uint64_t' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L2.h(248): warning C4244: 'initializing': conversion from 'uint64_t' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L2.h(253): warning C4244: '=': conversion from 'double' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L2.h(258): warning C4244: '=': conversion from 'double' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L2.h(263): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+d:\cbis\github\recode\src\L2.h(339): warning C4244: 'initializing': conversion from 'uint64_t' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L2.h(340): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L3.h(22): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L3.h(40): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+d:\cbis\github\recode\src\L3.h(62): warning C4244: 'initializing': conversion from 'uint64_t' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L3.h(85): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L3.h(125): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L3.h(178): warning C4244: 'initializing': conversion from 'uint64_t' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L3.h(179): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L3.h(208): warning C4244: 'argument': conversion from 'unsigned short' to 'uint8_t', possible loss of data
+d:\cbis\github\recode\src\L4.h(38): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L4.h(39): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L4.h(40): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L4.h(46): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L4.h(47): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L4.h(48): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L4.h(96): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L4.h(114): warning C4018: '<': signed/unsigned mismatch
+d:\cbis\github\recode\src\L4.h(118): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L4.h(136): warning C4244: '/=': conversion from 'double' to 'float', possible loss of data
+d:\cbis\github\recode\src\L4.h(137): warning C4244: '/=': conversion from 'double' to 'float', possible loss of data
+d:\cbis\github\recode\src\L4.h(184): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L4.h(194): warning C4244: 'initializing': conversion from 'uint64_t' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L4.h(207): warning C4244: 'initializing': conversion from 'uint64_t' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L4.h(212): warning C4244: '=': conversion from 'double' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L4.h(217): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+d:\cbis\github\recode\src\L4.h(284): warning C4244: 'initializing': conversion from 'uint64_t' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L4.h(285): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L4.h(361): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L4.h(410): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L4.h(429): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
+D:\cbis\GitHub\ReCoDe\src\recode.cpp(264): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+D:\cbis\GitHub\ReCoDe\src\recode.cpp(305): warning C4244: 'initializing': conversion from 'uint64_t' to 'unsigned long', possible loss of data
+D:\cbis\GitHub\ReCoDe\src\recode.cpp(382): error C3861: 'parse_init_params': identifier not found

@@ -271,6 +271,7 @@ void reduceCompressFrame_L4 (	uint8_t	 process_id,
 
 char* reduceCompress_L4 (uint8_t	 process_id, 
 						 const char  *original_filename, 
+                         const char  *out_foldername,
 						 uint16_t    *frameBuffer, 				// points to the start of this thread's chunk
 						 uint16_t    *darkFrame, 
 						 uint32_t    frame_start_index, 
@@ -289,12 +290,12 @@ char* reduceCompress_L4 (uint8_t	 process_id,
 		float 	 *y_coor 			 		= (float *) malloc  (n_pixels_in_frame * sizeof(float));
 		uint16_t *foregroundImage 	 		= (uint16_t *)calloc(n_pixels_in_frame, sizeof(uint16_t));
 		uint8_t  *centroidImage 			= (uint8_t *)calloc (n_bytes_in_binary_image, 1);			// allocated max space - where all pixels are fg pixels, must calloc to init to 0
-		int8_t  *foregroundTernaryMap 		= (int8_t *)calloc  (n_pixels_in_frame, sizeof(int8_t));
+		int8_t   *foregroundTernaryMap 		= (int8_t *)calloc  (n_pixels_in_frame, sizeof(int8_t));
 		uint8_t  *compressedCentroidImage	= (uint8_t*) malloc (n_pixels_in_frame * sizeof(uint8_t));
 	
 		// create part file
 		char* part_filename = makePartFilename(process_id, original_filename, 4);
-		FILE *fp = fopen (part_filename, "wb");
+		FILE *fp = fopen (concat(out_foldername, part_filename), "wb");
 		
 		// serialize part header
 		fwrite (&process_id, sizeof(uint8_t), 1, fp);
@@ -350,4 +351,119 @@ char* reduceCompress_L4 (uint8_t	 process_id,
 }
 
 
+void decompressExpand_L4(FILE* fp, uint16_t **frameBuffer, RCHeader **header) {
 
+	uint32_t nx = (*header)->nx;
+	uint32_t ny = (*header)->ny;
+	uint32_t nz = (*header)->nz;
+
+	uint32_t n_pixels_in_frame = nx * ny;														// number of pixels in the image
+	uint32_t n_bytes_in_binary_image = ceil(n_pixels_in_frame / 8.0);								// number of bytes needed to pack binary image
+
+	uint64_t sz_frameBuffer = nx * ny * nz * sizeof(uint16_t);
+	*frameBuffer = (uint16_t *)malloc(sz_frameBuffer);
+
+	uint32_t frame_id = 0;
+	uint32_t *n_compressed_bytes_in_frame = (uint32_t *)malloc(((*header)->nz) * sizeof(uint32_t));
+	for (frame_id = 0; frame_id < (*header)->nz; frame_id++) {
+		fread(&n_compressed_bytes_in_frame[frame_id], sizeof(uint32_t), 1, fp);
+	}
+
+	// read frames
+	for (frame_id = 0; frame_id < nz; frame_id++) {
+		
+		uint32_t n_compressed_bytes_binary_img = n_compressed_bytes_in_frame[frame_id];
+		uint8_t *compressedBinaryImage = (uint8_t*)calloc(n_compressed_bytes_in_frame[frame_id], sizeof(uint8_t));
+		fread(compressedBinaryImage, sizeof(uint8_t), n_compressed_bytes_binary_img, fp);
+		uint8_t* deCompressedBinaryImage = (uint8_t*)calloc(n_bytes_in_binary_image, sizeof(uint8_t));
+
+		decompress_stream(-1, -1, compressedBinaryImage, deCompressedBinaryImage, n_compressed_bytes_binary_img, n_bytes_in_binary_image);
+
+		uint32_t frame_start_linear_index = n_pixels_in_frame * frame_id;
+
+		uint32_t row, col, linear_pixel_index;
+		uint64_t n_fg_pixels = 0;
+		for (row = 0; row < ny; row++) {
+			for (col = 0; col < nx; col++) {
+				linear_pixel_index = row * nx + col;
+				//printf ("linear_pixel_index = %lu\n", linear_pixel_index);
+				if (CheckBit(deCompressedBinaryImage, linear_pixel_index) > 0) {
+					(*frameBuffer)[frame_start_linear_index + linear_pixel_index] = 1;
+					n_fg_pixels++;
+				}
+				else {
+					(*frameBuffer)[frame_start_linear_index + linear_pixel_index] = 0;
+				}
+			}
+		}
+
+	}
+}
+
+void decompressExpand_LoadSeekTable(FILE* fp, uint32_t *n_compressed_bytes_in_frame, RCHeader **header) {
+
+	uint32_t nx = (*header)->nx;
+	uint32_t ny = (*header)->ny;
+	uint32_t nz = (*header)->nz;
+
+	uint32_t n_pixels_in_frame = nx * ny;														// number of pixels in the image
+	uint32_t n_bytes_in_binary_image = ceil(n_pixels_in_frame / 8.0);							// number of bytes needed to pack binary image
+
+	uint64_t sz_frameBuffer = nx * ny * 2 * sizeof(uint16_t);
+	uint16_t *frameBuffer = (uint16_t *)malloc(sz_frameBuffer);
+
+	uint32_t frame_id = 0;
+	
+	for (frame_id = 0; frame_id < (*header)->nz; frame_id++) {
+		fread(&n_compressed_bytes_in_frame[frame_id], sizeof(uint32_t), 1, fp);
+	}
+}
+
+void decompressExpandFrame_L4_Sparse (FILE* fp, uint32_t frame_position, uint16_t **frameBuffer, RCHeader **header) {
+
+	uint32_t nx = (*header)->nx;
+	uint32_t ny = (*header)->ny;
+	uint32_t nz = (*header)->nz;
+
+	uint32_t n_pixels_in_frame = nx * ny;														// number of pixels in the image
+	uint32_t n_bytes_in_binary_image = ceil(n_pixels_in_frame / 8.0);							// number of bytes needed to pack binary image
+
+	uint64_t sz_frameBuffer = nx * ny * nz * 2 * sizeof(uint16_t);
+	*frameBuffer = (uint16_t *)malloc(sz_frameBuffer);
+
+	uint32_t frame_id = 0;
+	uint32_t *n_compressed_bytes_in_frame = (uint32_t *)malloc(((*header)->nz) * sizeof(uint32_t));
+	for (frame_id = 0; frame_id < (*header)->nz; frame_id++) {
+		fread(&n_compressed_bytes_in_frame[frame_id], sizeof(uint32_t), 1, fp);
+	}
+
+	// read frames
+	for (frame_id = 0; frame_id < nz; frame_id++) {
+
+		uint32_t n_compressed_bytes_binary_img = n_compressed_bytes_in_frame[frame_id];
+		uint8_t *compressedBinaryImage = (uint8_t*)calloc(n_compressed_bytes_in_frame[frame_id], sizeof(uint8_t));
+		fread(compressedBinaryImage, sizeof(uint8_t), n_compressed_bytes_binary_img, fp);
+		uint8_t* deCompressedBinaryImage = (uint8_t*)calloc(n_bytes_in_binary_image, sizeof(uint8_t));
+
+		decompress_stream(-1, -1, compressedBinaryImage, deCompressedBinaryImage, n_compressed_bytes_binary_img, n_bytes_in_binary_image);
+
+		uint32_t frame_start_linear_index = n_pixels_in_frame * frame_id;
+
+		uint32_t row, col, linear_pixel_index;
+		uint64_t n_fg_pixels = 0;
+		for (row = 0; row < ny; row++) {
+			for (col = 0; col < nx; col++) {
+				linear_pixel_index = row * nx + col;
+				//printf ("linear_pixel_index = %lu\n", linear_pixel_index);
+				if (CheckBit(deCompressedBinaryImage, linear_pixel_index) > 0) {
+					(*frameBuffer)[frame_start_linear_index + linear_pixel_index] = 1;
+					n_fg_pixels++;
+				}
+				else {
+					(*frameBuffer)[frame_start_linear_index + linear_pixel_index] = 0;
+				}
+			}
+		}
+
+	}
+}

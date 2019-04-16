@@ -114,13 +114,48 @@ void getFrame (File* mrcFile, MRCHeader **mrc_header, int frame_number) {
 void getNextFrame (File* mrcFile, MRCHeader **mrc_header) {
 	
 }
-
-void getFrames (File* mrcFile, MRCHeader **mrc_header, int frame_start, int frame_end) {
-	
-}
 */
+void getMRCFrames (FILE* mrcFile, uint16_t *buffer, uint64_t frame_start, uint64_t n_Frames, DataSize d) {
+	
+	// Important: this method assumes the data has 16-bit depth
+	
+	// load data
+	size_t seek_count = fseek(mrcFile, MRC_HEADER_LEN + (d.nx*d.ny*frame_start), SEEK_SET);
 
+	uint64_t n_pixels_in_frame = d.nx*d.ny;
+	uint64_t chunk_size_frames = 200;
+	uint64_t chunk_size_pixels = chunk_size_frames * n_pixels_in_frame;
+	uint64_t iter_c = floor((uint64_t)n_Frames / chunk_size_frames);
+	uint64_t rem_sz = (uint64_t)n_Frames % chunk_size_frames;
+	uint64_t i;
+	uint64_t read_count = 0;
+	uint64_t n_elem = 0;
 
+	recode_print("nx: %lu\n", d.nx);
+	recode_print("ny: %lu\n", d.ny);
+	recode_print("nf: %"PRIu64"\n", n_Frames);
+	recode_print("iter_c: %"PRIu64"\n", iter_c);
+
+	for (i = 0; i < iter_c; i++) {
+		n_elem = i*chunk_size_pixels;
+		read_count += fread(buffer + n_elem, sizeof(uint16_t), chunk_size_pixels, mrcFile);
+	}
+	n_elem = i*chunk_size_pixels;
+	read_count += fread(buffer + i*chunk_size_pixels, sizeof(uint16_t), n_pixels_in_frame*rem_sz, mrcFile);
+	fclose(mrcFile);
+
+	recode_print("Seek Count: %"PRIu64"\n", seek_count);
+	recode_print("Read Count: %"PRIu64"\n", read_count);
+
+	uint64_t expected_read_count = d.nx*d.ny*n_Frames;
+	recode_print("Expected Read Count: %"PRIu64"\n", expected_read_count);
+
+	if (read_count != expected_read_count) {
+		printf("An unexpected error occurred.\nActual and expected read counts do not match. Exiting.");
+		exit(0);
+	}
+
+}
 
 int getBitDepth(MRCHeader* header) {
     if( header->mrcType == MRC_INT8 ) {
@@ -134,6 +169,7 @@ int getBitDepth(MRCHeader* header) {
     } else if( header->mrcType == MRC_UINT16 ) {
         return 16;
     } else {
-        return -1;
+		printf("Error in getBitDepth() in mrchandler: unknown MRC type %d.", header->mrcType);
+		exit(0);
     }
 }

@@ -310,9 +310,7 @@ void reduceCompressFrame_L1 (	uint8_t	 process_id,
 		}
 		
 
-		recode_print ("RCT %"PRIu8": Frame ID = %"PRIu32", n_bytes_in_packed_pixvals = %"PRIu32"\n", process_id, frame_id, *n_bytes_in_packed_pixvals);
-
-		
+		recode_print ("RCT %d: Frame ID = %lu, n_bytes_in_packed_pixvals = %lu\n", process_id, frame_id, *n_bytes_in_packed_pixvals);
 
 		run_metrics[0] += reduction_time;
 		run_metrics[1] += compression_time;
@@ -456,10 +454,10 @@ char* reduceCompress_L1 (uint8_t	 process_id,
 
 
 char* merge_RC1_Parts(const char* folderpath, 
-					 char** 	 part_filenames, 
-					 const int 		 num_partfiles, 
-					 RCHeader 	 *rcHeader, 
-					 const char  *compressed_filename) {
+					 char**       part_filenames, 
+					 const int    num_partfiles, 
+					 RCHeader 	  *rcHeader, 
+					 const char   *compressed_filename) {
 	
 	clock_t merge_start = clock();
 	
@@ -610,15 +608,15 @@ char* merge_RC1_Parts(const char* folderpath,
 }
 
 
-void decompressExpand_L1 (	const char* compressed_filename, 
-							uint16_t	**frameBuffer, 
-							RCHeader 	**header) {
+void decompressExpand_L1 ( FILE* fp,
+                           uint16_t **frameBuffer, 
+                           RCHeader **header) {
 	
 	
-	FILE* fp = fopen(compressed_filename,"rb");
+	//FILE* fp = fopen(compressed_filename,"rb");
 	
 	// read RC header from compressed file
-	parse_recode_header (fp, header);
+	//parse_recode_header (fp, header);
 	
 	// read compressed data lengths
 	uint32_t frame_id = 0;

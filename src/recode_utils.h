@@ -32,6 +32,13 @@ char* makePartFilename(unsigned char process_id, const char *original_filename, 
 	return filename;
 }
 
+char* makeValidationFilename(unsigned char process_id, const char *original_filename) {
+	char part_num[4];
+	sprintf(part_num, "%03d", process_id);
+	char* filename = concat(concat(concat(original_filename, "_part"), part_num), "_validation_frames");
+	return filename;
+}
+
 
 bool startsWith(const char *str, const char *pre) {
     return strncmp(pre, str, strlen(pre)) == 0;

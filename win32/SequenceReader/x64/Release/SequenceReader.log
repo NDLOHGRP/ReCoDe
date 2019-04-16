@@ -1,0 +1,120 @@
+﻿  sequence_reader.cpp
+..\..\src\sequence_reader.cpp(11): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stdio.h(205): note: see declaration of 'fopen'
+..\..\src\sequence_reader.cpp(74): warning C4244: 'argument': conversion from 'uint64_t' to 'long', possible loss of data
+  sequence_reader_test.cpp
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(112): error C3861: 'memcpy': identifier not found
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(113): error C3861: 'memcpy': identifier not found
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(114): error C3861: 'memcpy': identifier not found
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(115): error C3861: 'memcpy': identifier not found
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(116): error C3861: 'memcpy': identifier not found
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(117): error C3861: 'memcpy': identifier not found
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(118): error C3861: 'memcpy': identifier not found
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(119): error C3861: 'memcpy': identifier not found
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(120): error C3861: 'memcpy': identifier not found
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(121): error C3861: 'memcpy': identifier not found
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(122): error C3861: 'memcpy': identifier not found
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(123): error C3861: 'memcpy': identifier not found
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(124): error C3861: 'memcpy': identifier not found
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(125): error C3861: 'memcpy': identifier not found
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(126): error C3861: 'memcpy': identifier not found
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(127): error C3861: 'memcpy': identifier not found
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(128): error C3861: 'memcpy': identifier not found
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(129): error C3861: 'memcpy': identifier not found
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(130): error C3861: 'memcpy': identifier not found
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(131): error C3861: 'memcpy': identifier not found
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(132): error C3861: 'memcpy': identifier not found
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(133): error C3861: 'memcpy': identifier not found
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(134): error C3861: 'memcpy': identifier not found
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(135): error C3861: 'memcpy': identifier not found
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(136): error C3861: 'memcpy': identifier not found
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(137): error C3861: 'memcpy': identifier not found
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(138): error C3861: 'memcpy': identifier not found
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(139): error C3861: 'memcpy': identifier not found
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(140): error C3861: 'memcpy': identifier not found
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(141): error C3861: 'memcpy': identifier not found
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(142): error C3861: 'memcpy': identifier not found
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(143): error C3861: 'memcpy': identifier not found
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(144): error C3861: 'memcpy': identifier not found
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(149): error C2065: 'FILE': undeclared identifier
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(149): error C2065: 'fp': undeclared identifier
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(149): error C2065: 'seq_header': undeclared identifier
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(149): error C2275: 'SEQHeader': illegal use of this type as an expression
+  D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(107): note: see declaration of 'SEQHeader'
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(149): error C2182: 'getSEQHeader': illegal use of type 'void'
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(149): error C2448: 'getSEQHeader': function-style initializer appears to be a function definition
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(168): error C2065: 'FILE': undeclared identifier
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(168): error C2065: 'seqFile': undeclared identifier
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(168): error C2275: 'uint64_t': illegal use of this type as an expression
+  C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\stdint.h(24): note: see declaration of 'uint64_t'
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(168): error C2146: syntax error: missing ')' before identifier 'frame_no'
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(168): error C2143: syntax error: missing ';' before '{'
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(168): error C2447: '{': missing function header (old-style formal list?)
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(181): error C2065: 'FILE': undeclared identifier
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(181): error C2065: 'seqFile': undeclared identifier
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(181): error C2275: 'uint64_t': illegal use of this type as an expression
+  C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\stdint.h(24): note: see declaration of 'uint64_t'
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(181): error C2146: syntax error: missing ')' before identifier 'frame_no'
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(181): error C2143: syntax error: missing ';' before '{'
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(181): error C2447: '{': missing function header (old-style formal list?)
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(188): error C2065: 'FILE': undeclared identifier
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(188): error C2065: 'seqFile': undeclared identifier
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(188): error C2065: 'buffer': undeclared identifier
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(188): error C2275: 'uint16_t': illegal use of this type as an expression
+  C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\stdint.h(22): note: see declaration of 'uint16_t'
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(188): error C2275: 'uint64_t': illegal use of this type as an expression
+  C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\stdint.h(24): note: see declaration of 'uint64_t'
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(188): error C2146: syntax error: missing ')' before identifier 'frame_start'
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(188): error C2143: syntax error: missing ';' before '{'
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(188): error C2447: '{': missing function header (old-style formal list?)
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(214): error C2065: 'FILE': undeclared identifier
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(214): error C2065: 'seqFile': undeclared identifier
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(214): error C2065: 'buffer': undeclared identifier
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(214): error C2275: 'uint16_t': illegal use of this type as an expression
+  C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\stdint.h(22): note: see declaration of 'uint16_t'
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(214): error C2275: 'uint64_t': illegal use of this type as an expression
+  C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\stdint.h(24): note: see declaration of 'uint64_t'
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(214): error C2146: syntax error: missing ')' before identifier 'n_Frames'
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(214): error C2143: syntax error: missing ';' before '{'
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(214): error C2447: '{': missing function header (old-style formal list?)
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(230): error C2065: 'FILE': undeclared identifier
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(230): error C2065: 'seqFile': undeclared identifier
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(230): error C2065: 'header': undeclared identifier
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(230): error C2275: 'SEQHeader': illegal use of this type as an expression
+  D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(107): note: see declaration of 'SEQHeader'
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(230): error C2182: 'writeSEQHeader': illegal use of type 'void'
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(230): error C2448: 'writeSEQHeader': function-style initializer appears to be a function definition
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(278): error C3861: 'sprintf': identifier not found
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(279): error C3861: 'concat': identifier not found
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(280): error C2065: 'FILE': undeclared identifier
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(280): error C2065: 'fp': undeclared identifier
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(280): error C3861: 'fopen': identifier not found
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(281): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(282): error C2065: 'fp': undeclared identifier
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(283): error C2065: 'fp': undeclared identifier
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(283): error C3861: 'setSEQFileData': identifier not found
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(284): error C2065: 'fp': undeclared identifier
+D:\cbis\GitHub\ReCoDe\src\sequence_reader.h(284): error C3861: 'fclose': identifier not found
+..\..\tests\sequence_reader_test.cpp(12): error C3861: 'printf': identifier not found
+..\..\tests\sequence_reader_test.cpp(13): error C2065: 'SEQReader': undeclared identifier
+..\..\tests\sequence_reader_test.cpp(13): error C2065: 'reader': undeclared identifier
+..\..\tests\sequence_reader_test.cpp(13): error C2061: syntax error: identifier 'SEQReader'
+..\..\tests\sequence_reader_test.cpp(15): error C2065: 'reader': undeclared identifier
+..\..\tests\sequence_reader_test.cpp(15): error C2227: left of '->header' must point to class/struct/union/generic type
+  ..\..\tests\sequence_reader_test.cpp(15): note: type is 'unknown-type'
+..\..\tests\sequence_reader_test.cpp(15): error C2228: left of '.ImageInfo' must have class/struct/union
+..\..\tests\sequence_reader_test.cpp(15): error C2228: left of '.ImageWidth' must have class/struct/union
+..\..\tests\sequence_reader_test.cpp(15): error C2228: left of '.ImageHeight' must have class/struct/union
+..\..\tests\sequence_reader_test.cpp(15): error C2228: left of '.ImageBitDepth' must have class/struct/union
+..\..\tests\sequence_reader_test.cpp(17): error C2065: 'reader': undeclared identifier
+..\..\tests\sequence_reader_test.cpp(17): error C2227: left of '->get_frame' must point to class/struct/union/generic type
+  ..\..\tests\sequence_reader_test.cpp(17): note: type is 'unknown-type'
+..\..\tests\sequence_reader_test.cpp(19): error C2065: 'reader': undeclared identifier
+..\..\tests\sequence_reader_test.cpp(19): error C2227: left of '->get_next_frame' must point to class/struct/union/generic type
+  ..\..\tests\sequence_reader_test.cpp(19): note: type is 'unknown-type'
+..\..\tests\sequence_reader_test.cpp(23): error C2065: 'reader': undeclared identifier
+..\..\tests\sequence_reader_test.cpp(23): error C2227: left of '->get_frames' must point to class/struct/union/generic type
+  ..\..\tests\sequence_reader_test.cpp(23): note: type is 'unknown-type'
+..\..\tests\sequence_reader_test.cpp(25): error C2065: 'reader': undeclared identifier
+..\..\tests\sequence_reader_test.cpp(25): error C2541: 'delete': cannot delete objects that are not pointers
+..\..\tests\sequence_reader_test.cpp(25): fatal error C1003: error count exceeds 100; stopping compilation

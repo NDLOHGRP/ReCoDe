@@ -326,6 +326,7 @@ void reduceCompressFrame_L2 (	uint8_t	 process_id,
 
 char* reduceCompress_L2 (uint8_t	 process_id, 
 						 const char  *original_filename, 
+	                     const char  *out_foldername,
 						 uint16_t    *frameBuffer, 				// points to the start of this thread's chunk
 						 uint16_t    *darkFrame, 
 						 uint32_t    frame_start_index, 
@@ -352,7 +353,7 @@ char* reduceCompress_L2 (uint8_t	 process_id,
 	
 		// create part file
 		char* part_filename = makePartFilename(process_id, original_filename, 2);
-		FILE *fp = fopen (part_filename, "wb");
+		FILE *fp = fopen (concat(out_foldername, part_filename), "wb");
 		
 		// serialize part header
 		fwrite (&process_id, sizeof(uint8_t), 1, fp);
@@ -422,5 +423,6 @@ char* reduceCompress_L2 (uint8_t	 process_id,
 
 }
 
-
-
+void decompressExpand_L2(FILE* fp, uint16_t **frameBuffer, RCHeader **header) {
+	printf("Not supported yet.");
+}

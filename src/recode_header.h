@@ -1,18 +1,3 @@
-
-
-#define VERSION_MAJOR	0
-#define VERSION_MINOR	1
-
-#define MAX_FILENAME_LENGTH			100
-
-#define SOURCE_FILE_TYPE_BINARY		0
-#define SOURCE_FILE_TYPE_MRC		1
-#define SOURCE_FILE_TYPE_OTHER		2
-
-#define SOURCE_HEADER_POSITION_PRE		0
-#define SOURCE_HEADER_POSITION_POST		1
-
-
 typedef struct {
 	
 	/*
@@ -36,6 +21,12 @@ typedef struct {
 	1 = Level 1, 2 = Level 2, 3 = Level 3, 4 = Level 4
 	*/
 	uint8_t		reduction_level;
+
+	/*
+	Operation mode used by ReCoDe
+	0 = Reduction Only, 1 = Reduction + Compression
+	*/
+	uint8_t		recode_operation_mode;
 	
 	/*
 	The bit depth used to store pixel intensity values. Only used for L1 and L2. Ignored in L3 and L4.
@@ -165,8 +156,6 @@ typedef struct {
 
 void create_recode_header (InputParams *input_params, uint8_t id, uint8_t *source_name, uint8_t *dark_name, RCHeader **header) {
 	
-	
-	
 	if (id != -1) {
 		(*header)->uid = id;
 	} else {
@@ -177,6 +166,7 @@ void create_recode_header (InputParams *input_params, uint8_t id, uint8_t *sourc
 	(*header)->version_minor 			= VERSION_MINOR;
 	
 	(*header)->reduction_level 			= input_params->reduction_level;
+	(*header)->recode_operation_mode    = input_params->rc_operation_mode;
 	(*header)->bit_depth 				= input_params->bit_depth;
 	(*header)->nx						= input_params->num_cols;
 	(*header)->ny						= input_params->num_rows;
@@ -221,6 +211,7 @@ void parse_recode_header (FILE *fp, RCHeader **header) {
 	fread (&(*header)->version_major, 			sizeof(uint8_t),  1, fp);
 	fread (&(*header)->version_minor, 			sizeof(uint8_t),  1, fp);
 	fread (&(*header)->reduction_level,			sizeof(uint8_t),  1, fp);
+	fread (&(*header)->recode_operation_mode,   sizeof(uint8_t),  1, fp);
 	fread (&(*header)->bit_depth, 				sizeof(uint8_t),  1, fp);
 	fread (&(*header)->nx, 						sizeof(uint16_t), 1, fp);
 	fread (&(*header)->ny, 						sizeof(uint16_t), 1, fp);
@@ -259,6 +250,7 @@ void serialize_recode_header (FILE *fp, RCHeader *header) {
 	fwrite (&header->version_major, 			sizeof(uint8_t),  1, fp);
 	fwrite (&header->version_minor, 			sizeof(uint8_t),  1, fp);
 	fwrite (&header->reduction_level,			sizeof(uint8_t),  1, fp);
+	fwrite (&header->recode_operation_mode,     sizeof(uint8_t),  1, fp);
 	fwrite (&header->bit_depth, 				sizeof(uint8_t),  1, fp);
 	fwrite (&header->nx, 						sizeof(uint16_t), 1, fp);
 	fwrite (&header->ny, 						sizeof(uint16_t), 1, fp);
@@ -301,6 +293,7 @@ void print_recode_header (RCHeader *header) {
 	printf ("ReCoDE Version: \t %" PRIu8 ".", header->version_major);
 	printf ("%" PRIu8 "\n", header->version_minor);
 	printf ("Reduction Level: \t L%" PRIu8 " \n", header->reduction_level);
+	printf ("Operation Mode: \t %" PRIu8 " \n", header->recode_operation_mode);
 	printf ("Bit-depth: \t\t %" PRIu8 " \n", header->bit_depth);
 	printf ("Number of Columns: \t %" PRIu16 " \n", header->nx);
 	printf ("Number of Rows: \t %" PRIu16 " \n", header->ny);

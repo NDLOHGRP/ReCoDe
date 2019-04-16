@@ -1,17 +1,3 @@
-#define	 DTYPE_USHORT	16
-
-#define SetBit(A,k)		( A[(k/8)] |= (1 << (k%8)) )
-#define ClearBit(A,k)	( A[(k/8)] &= ~(1 << (k%8)) )
-#define CheckBit(A,k)	( A[(k/8)] & (1 << (k%8)) )
-
-typedef struct {
-	uint64_t	nx;
-	uint64_t	ny;
-	uint64_t	nz;
-	uint64_t	dtype;
-} DataSize;
-
-
 
 
 
@@ -75,7 +61,7 @@ void getDarkMax (uint16_t *darkBuffer, DataSize h, uint16_t *darkFrame, uint8_t 
 	}
 	*/
 	
-	#pragma omp parallel for num_threads(nThreads) collapse(2)
+	//#pragma omp parallel for num_threads(nThreads) collapse(2)
 	for (row = 0; row < h.ny; row++) {
 		for (col = 0; col < h.nx; col++) {
 			pixel_index = row * h.nx + col;
@@ -134,7 +120,7 @@ void getDarkMax (uint16_t *darkBuffer, DataSize h, uint16_t *darkFrame, uint8_t 
 	
 }
 
-void loadData (const char* filename, uint16_t *buffer, uint32_t frameStart, uint32_t n_Frames, DataSize d) {
+void loadBinaryData (const char* filename, uint16_t *buffer, uint32_t frameStart, uint32_t n_Frames, DataSize d) {
 	
 	// load data
 	FILE *fp = fopen(filename, "rb");
@@ -172,6 +158,44 @@ void loadData (const char* filename, uint16_t *buffer, uint32_t frameStart, uint
 		printf("An unexpected error occurred.\nActual and expected read counts do not match. Exiting.");
 		exit(0);
 	}
+}
+
+void loadMRCData(const char* filename, uint16_t *buffer, uint32_t frameStart, uint32_t n_Frames, DataSize d) {
+	MRCHeader *mrc_header = (MRCHeader *)malloc(sizeof(MRCHeader));
+	//parseMRCHeader(filename, &mrc_header);
+	// load data
+	FILE *fp = fopen(filename, "rb");
+	getMRCFrames(fp, buffer, frameStart, n_Frames, d);
+}
+
+uint64_t loadSEQData(const char* filename, uint16_t *buffer, uint32_t frameStart, uint32_t n_Frames) {
+	FILE *fp = fopen(filename, "rb");
+	if (!fp) {
+		printf("Failed to open file: '%s' for reading.", filename);
+		exit(1);
+	}
+	SEQHeader *seq_header = (SEQHeader *)malloc(sizeof(SEQHeader));
+	getSEQHeader(fp, &seq_header);
+	// load data
+	uint64_t retval = getSEQFrames(0, fp, buffer, frameStart, n_Frames, seq_header);
+	fclose(fp);
+	return retval;
+}
+
+uint64_t loadData(uint8_t file_type, const char* filename, uint16_t *buffer, uint32_t frameStart, uint32_t n_Frames, DataSize d) {
+
+	if (file_type == SOURCE_FILE_TYPE_BINARY) {
+		loadBinaryData(filename, buffer, frameStart, n_Frames, d);
+		return 0;
+	}
+	else if (file_type == SOURCE_FILE_TYPE_MRC) {
+		loadMRCData(filename, buffer, frameStart, n_Frames, d);
+		return 0;
+	}
+	else if (file_type == SOURCE_FILE_TYPE_SEQUENCE) {
+		return loadSEQData(filename, buffer, frameStart, n_Frames);
+	}
+
 }
 
 // Used in L4 and L2
