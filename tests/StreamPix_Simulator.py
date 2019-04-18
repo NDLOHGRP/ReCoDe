@@ -17,8 +17,8 @@ def write_file(fpath, data):
         write_file.write(data)
 
 
-ITERATIONS = 3
-THROUGHPUT_IN_SECS_PER_CHUNK = 1
+ITERATIONS = 4
+THROUGHPUT_IN_SECS_PER_CHUNK = 5
 
 source_directory = "D:\\cbis\\GitHub\\ReCoDe\\scratch\\temp"
 target_directory = "R:\\"

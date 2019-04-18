@@ -32,6 +32,29 @@ char* makePartFilename(unsigned char process_id, const char *original_filename, 
 	return filename;
 }
 
+char* makeCompressedFilename(const char *original_filename, unsigned int reduction_level) {
+
+	const char* x;
+	if (reduction_level == 1) {
+		x = ".rc1";
+	}
+	else if (reduction_level == 2) {
+		x = ".rc2";
+	}
+	else if (reduction_level == 3) {
+		x = ".rc3";
+	}
+	else if (reduction_level == 4) {
+		x = ".rc4";
+	}
+	else {
+		x = ".rcX";
+	}
+
+	char* filename = concat(original_filename, x);
+	return filename;
+}
+
 char* makeValidationFilename(unsigned char process_id, const char *original_filename) {
 	char part_num[4];
 	sprintf(part_num, "%03d", process_id);

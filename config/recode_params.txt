@@ -54,7 +54,7 @@ Dark_Frame_Offset = 0
 Keep_Part_Files = 0
 
 # The number of OMP threads used. Num_Threads = 1 implies no parallelism.
-Num_Threads = 2
+Num_Threads = 1
 
 # The statistic to be stored for L2
 # 0 = None, 1 = Max, 2 = Mean

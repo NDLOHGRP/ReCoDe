@@ -61,14 +61,12 @@ float binarize_and_get_pixvals (uint8_t	 process_id,
 	}
 	
 	//printf("No. of foreground pixels = %lu\n", *n_fg_pixels);
+	recode_print("RCT %d: No. of foreground pixels = %lu\n", process_id, *n_fg_pixels);
 
 	clock_t p_end = clock();
 	float process_time = (p_end - p_start) * 1000.0 / CLOCKS_PER_SEC;
 	return process_time;
 }
-
-
-
 
 float scale_and_pack_pixvals (	uint8_t	 process_id,
 								uint16_t *pixvals, 
@@ -119,8 +117,6 @@ float scale_and_pack_pixvals (	uint8_t	 process_id,
 	
 }
 
-
-
 float reduceFrame_L1 (  uint8_t	 process_id,
 						uint16_t *frameBuffer, 
 						uint16_t *darkFrame, 
@@ -132,7 +128,6 @@ float reduceFrame_L1 (  uint8_t	 process_id,
 						uint8_t  *binaryImage,
 						uint8_t  *packedPixvals,
 						uint32_t *n_bytes_in_packed_pixvals) {
-	
 	
 	/*
 	========================================================================================== 
@@ -156,8 +151,6 @@ float reduceFrame_L1 (  uint8_t	 process_id,
 	
 	return reduction_time;
 }
-
-
 
 float compressFrame_L1 (uint8_t	 process_id,
 						uint8_t  *binaryImage,
@@ -186,7 +179,6 @@ float compressFrame_L1 (uint8_t	 process_id,
 	
 	return compression_time;
 }
-
 
 float decompressFrame_L1 (	uint8_t	 process_id,
 							DataSize h, 
@@ -310,7 +302,7 @@ void reduceCompressFrame_L1 (	uint8_t	 process_id,
 		}
 		
 
-		recode_print ("RCT %d: Frame ID = %lu, n_bytes_in_packed_pixvals = %lu\n", process_id, frame_id, *n_bytes_in_packed_pixvals);
+		//recode_print ("RCT %d: Frame ID = %lu, n_bytes_in_packed_pixvals = %lu\n", process_id, frame_id, *n_bytes_in_packed_pixvals);
 
 		run_metrics[0] += reduction_time;
 		run_metrics[1] += compression_time;

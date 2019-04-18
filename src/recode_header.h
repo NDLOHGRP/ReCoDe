@@ -154,7 +154,7 @@ typedef struct {
 } RCHeader;
 
 
-void create_recode_header (InputParams *input_params, uint8_t id, uint8_t *source_name, uint8_t *dark_name, RCHeader **header) {
+void create_recode_header (InputParams *input_params, uint8_t id, const char *source_name, const char *dark_name, RCHeader **header) {
 	
 	if (id != -1) {
 		(*header)->uid = id;

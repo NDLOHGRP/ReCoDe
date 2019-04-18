@@ -76,7 +76,7 @@ to run:        ./fly
 #define    RC_WRITE_MODE_RETURN_COPY	2        // reduceCompressFrame_L1 and writes to return buffer and the data is copied to OLT buffer
 
 // Global Variables
-unsigned int	WAIT_MILLISECONDS	= 1;
+// unsigned int	WAIT_MILLISECONDS	= 1;
 char*			IMAGE_FILENAME		= "";
 RunStats*		RUN_STATS;
 uint8_t*		RCT_STATE_INDICATORS;
@@ -87,7 +87,7 @@ void runRCT_L1(
 	InitParams *init_params,
 	InputParams *params,
 	RCHeader *header,
-	uint16_t* darkFrame,
+	uint16_t *darkFrame,
 	uint8_t process_id,
 	uint8_t MPI_PID_Offset,
 	uint8_t *pBuffer,
@@ -96,8 +96,8 @@ void runRCT_L1(
 
 	printf("RCT: %d: Starting... \n", process_id);
 
+	uint8_t copy_compressed_frame_to_return_buffer = 1;
 	uint8_t rc_operation_mode = params->reduction_level;
-	uint8_t rc_write_mode = 2;
 	char* destination_directory = init_params->output_directory;
 	char* name = init_params->run_name;
 	int validation_frame_gap = init_params->validation_frame_gap;
@@ -110,21 +110,12 @@ void runRCT_L1(
 	uint64_t run_count = 0;
 	uint64_t count = 0;
 	uint64_t wait_time = 0;
-	long available_buffer_space = BUFFER_LENGTH;
+	uint64_t available_buffer_space = BUFFER_LENGTH;
 	uint64_t RCT_Buffer_Fill_Position = 0;
 	uint8_t RCT_FULL_IND = 0;
 	uint64_t nWrites = 0;
 	uint64_t run_offset = 0;
-	uint64_t absolute_frame_index;
-	uint64_t n_frames_in_chunk;
-
-	uint8_t copy_compressed_frame_to_return_buffer;
-	if (rc_write_mode > RC_WRITE_MODE_NO_RETURN) {
-		copy_compressed_frame_to_return_buffer = 1;
-	} else {
-		copy_compressed_frame_to_return_buffer = 0;
-	}
-
+	uint64_t absolute_frame_index, n_frames_in_chunk;
 	uint32_t n_bytes_in_packed_pixvals, n_compressed_bytes_1, n_compressed_bytes_2, compressed_frame_length;
 
 	// create data buffers
@@ -138,7 +129,7 @@ void runRCT_L1(
 	uint8_t  *compressedPackedPixvals = (uint8_t*)malloc(n_pixels_in_frame * sizeof(uint8_t));
 	uint8_t  *compressed_frame = (uint8_t*)malloc(n_pixels_in_frame * sizeof(uint8_t));
 
-	const char* filename = makePartFilename(process_id, name, 1);
+	const char* filename = makePartFilename(process_id, name, params->reduction_level);
 	char* bfilename = concat(destination_directory, filename);
 	printf("RCT: %d: Will be using part file '%s'\n", process_id, bfilename);
 
@@ -196,6 +187,21 @@ void runRCT_L1(
 			}
 			getSEQHeader(fp, &seq_header);
 
+			// Do basic sanity checks
+			uint64_t frame_sz_in_bytes = seq_header->ImageInfo.ImageWidth * seq_header->ImageInfo.ImageHeight * (seq_header->ImageInfo.ImageBitDepth / 8);
+			if (header->nx != seq_header->ImageInfo.ImageWidth) {
+				printf("Input parameter 'nx' (%d) does not match actual image width (%d). Quitting.\n", header->nx, seq_header->ImageInfo.ImageWidth);
+				exit(1);
+			}
+			if (header->ny != seq_header->ImageInfo.ImageHeight) {
+				printf("Input parameter 'ny' (%d) does not match actual image height (%d). Quitting.\n", header->nx, seq_header->ImageInfo.ImageHeight);
+				exit(1);
+			}
+			if (params->source_bit_depth != seq_header->ImageInfo.ImageBitDepthReal) {
+				printf("Input parameter 'bit_depth' (%d) does not match actual image bit depth (%d). Quitting.\n", header->bit_depth, seq_header->ImageInfo.ImageBitDepthReal);
+				exit(1);
+			}
+
 			// Determine the number of available frames for this thread
 			n_frames_in_chunk = seq_header->AllocatedFrames;
 			uint64_t n_frames_per_thread = ceil((n_frames_in_chunk*1.0) / (params->num_threads*1.0));
@@ -212,6 +218,8 @@ void runRCT_L1(
 			while (count < available_frames) {
 
 				absolute_frame_index = run_offset + frame_offset + count;
+
+				// serialize validation data
 				if (validation_frame_gap > 0) {
 					if (absolute_frame_index%validation_frame_gap == 0) {
 						fwrite(&absolute_frame_index, sizeof(uint64_t), 1, validationFile);
@@ -219,22 +227,21 @@ void runRCT_L1(
 						recode_print("RCT %d: Saving frame: %d\n", process_id, absolute_frame_index);
 					}
 				}
-				//recode_print("RCT %d: Processing frame: %d of %d [frame index = %d]\n", process_id, count, num_frames_to_process, absolute_frame_index);
-				count++;
-
-				/*
+				
+				// reduce compress
+				DataSize h = { header->nx, header->ny, num_frames_to_process, header->bit_depth };
 				reduceCompressFrame_L1(
 					process_id,
 					frameBuffer,
 					darkFrame,
-					absolute_frame_index,                // absolute frame index
+					absolute_frame_index,				// absolute frame index
 					count,								// frame index relative to start of this thread
 					h,
-					rc_operation_mode,                    // rc_operation_mode: 1 = reduce and compress
-					params->dark_threshold_epsilon,                                    // epsilon_s
-					params->source_bit_depth,                                    // bit_depth
-					0,                                    // compression_scheme: 0 = gzip
-					1,                                    // compression_level: 1 = fastest, 9 = best compression
+					rc_operation_mode,                  // rc_operation_mode: 1 = reduce and compress
+					params->dark_threshold_epsilon,     // epsilon_s
+					params->source_bit_depth,           // bit_depth
+					0,                                  // compression_scheme: 0 = gzip
+					1,                                  // compression_level: 1 = fastest, 9 = best compression
 					pixvals,
 					binaryImage,
 					packedPixvals,
@@ -250,52 +257,38 @@ void runRCT_L1(
 				);
 
 				if (available_buffer_space >= compressed_frame_length) {
-					if (rc_write_mode > RC_WRITE_MODE_RETURN_ONLY) {
-						for (i = 0; i < compressed_frame_length; i++) {
-							pBuffer[RCT_Buffer_Fill_Position + i] = compressed_frame[i];
-						}
-						//recode_print("Copying to OLT Buffer.\n");
-					}
 
-					RCT_Buffer_Fill_Position += compressed_frame_length;
-					if (RCT_Buffer_Fill_Position > BUFFER_LENGTH) {
-						printf("RCT %d: Buffer Fill Position = %llu", process_id, RCT_Buffer_Fill_Position);
+					// copy frame to buffer
+					for (i = 0; i < compressed_frame_length; i++) {
+						pBuffer[RCT_Buffer_Fill_Position + i] = compressed_frame[i];
 					}
+					RCT_Buffer_Fill_Position += compressed_frame_length;
 					available_buffer_space -= compressed_frame_length;
-					recode_print("RCT %d: copied frame %d (%u bytes) to buffer.\n", process_id, frame_offset + count, compressed_frame_length);
+					recode_print("RCT %d: Copied frame %d (%u bytes) to buffer.\n", process_id, frame_offset + count, compressed_frame_length);
 					count++;
 
-				}
-				else {
+				} else {
 
-					recode_print("RCT %d: buffer is full, waiting for OLT to clear.\n", process_id);
+					// offload data to disk
+					recode_print("RCT %d: buffer is full... clearing\n", process_id);
 					fwrite(pBuffer, sizeof(char), RCT_Buffer_Fill_Position, partFile);
+					fflush(partFile);
 					nWrites++;
-
 					available_buffer_space = BUFFER_LENGTH;
 					RCT_Buffer_Fill_Position = 0;
-					RCT_FULL_IND = 0;
-					recode_print("RCT %d: OLT cleared buffer.\n", process_id);
+					recode_print("RCT %d: done.\n", process_id);
 
 					// copy the last received frame that was never written
-					if (rc_write_mode > RC_WRITE_MODE_RETURN_ONLY) {
-						for (i = 0; i < compressed_frame_length; i++) {
-							pBuffer[RCT_Buffer_Fill_Position + i] = compressed_frame[i];
-						}
-						//recode_print("Copying to OLT Buffer.\n");
-						recode_print("RCT %d \t Waited Milliseconds: \t%d.\n", process_id, WAIT_MILLISECONDS*wait_time);
-						wait_time = 0;
-					}
-
+					for (i = 0; i < compressed_frame_length; i++) {
+						pBuffer[RCT_Buffer_Fill_Position + i] = compressed_frame[i];
+					}	
 					RCT_Buffer_Fill_Position += compressed_frame_length;
-					if (RCT_Buffer_Fill_Position > BUFFER_LENGTH) {
-						printf("RCT %d: Buffer Fill Position = %llu", process_id, RCT_Buffer_Fill_Position);
-					}
 					available_buffer_space -= compressed_frame_length;
 					count++;
-					recode_print("RCT %d: copied frame %d (%u bytes) to buffer.\n", process_id, frame_offset + count, compressed_frame_length);
+					recode_print("RCT %d: Copied frame %d (%u bytes) to buffer.\n", process_id, frame_offset + count, compressed_frame_length);
+
 				}
-				*/
+				
 			}
 
 			count = 0;
@@ -308,8 +301,8 @@ void runRCT_L1(
 
 			RCT_STATE_INDICATORS[process_id] = 1;
 
-			RCT_FULL_IND = 3;                            // this RCT is done, indicate OLT to close RCT's file
-
+			fwrite(pBuffer, sizeof(char), RCT_Buffer_Fill_Position, partFile);
+			nWrites++;
 			fclose(partFile);
 			if (validation_frame_gap > 0) {
 				fclose(validationFile);
@@ -322,7 +315,6 @@ void runRCT_L1(
 			free(compressedBinaryImage);
 			free(compressedPackedPixvals);
 			free(compressed_frame);
-			recode_print("RCT %d: Done (total wait time = %u milliseconds).\n", process_id, wait_time * WAIT_MILLISECONDS);
 
 			RUN_STATS[process_id].thread_id = process_id;
 			RUN_STATS[process_id].reduction_time = run_metrics[0];
@@ -331,7 +323,7 @@ void runRCT_L1(
 			RUN_STATS[process_id].compressed_bytes = run_metrics[3];
 			RUN_STATS[process_id].decompression_time = run_metrics[4];
 			RUN_STATS[process_id].num_writes = nWrites;
-			RUN_STATS[process_id].wait_time = wait_time * WAIT_MILLISECONDS;
+			RUN_STATS[process_id].wait_time = 0;
 
 			RCT_STATE_INDICATORS[process_id] = 0;
 
@@ -425,7 +417,18 @@ void reset_run_stats() {
 
 }
 
-int start_zmq_server(InitParams *init_params, InputParams *params) {
+void mergePartFiles(InitParams *init_params, InputParams *params, RCHeader *header) {
+
+	const char *compressed_filename = makeCompressedFilename(init_params->image_filename, params->reduction_level);
+	char** part_filenames = (char**)malloc((params->num_threads) * sizeof(char*));
+	int part_num;
+	for (part_num = 0; part_num < params->num_threads; part_num++) {
+		part_filenames[part_num] = makePartFilename(part_num, init_params->run_name, params->reduction_level);
+	}
+	merge_RC1_Parts(init_params->output_directory, part_filenames, params->num_threads, header, compressed_filename);
+}
+
+int start_zmq_server(InitParams *init_params, InputParams *params, RCHeader *header) {
 
 	//  Socket to talk to clients
 	void *context = zmq_ctx_new();
@@ -448,6 +451,7 @@ int start_zmq_server(InitParams *init_params, InputParams *params) {
 			while (get_RCT_States(RCT_STATE_INDICATORS, params->num_threads, 1) != 0) {
 				Sleep(100);          //  Wait for RCT Threads to finish
 			}
+			mergePartFiles(init_params, params, header);
 			zmq_send(responder, "Shutdown Complete", 17, 0);
 			exit(0);
 		}
@@ -464,7 +468,7 @@ int start_zmq_server(InitParams *init_params, InputParams *params) {
 	return 0;
 }
 
-void _simulate_zmq_run(InitParams *init_params, InputParams *params) {
+void _simulate_zmq_run(InitParams *init_params, InputParams *params, RCHeader *header) {
 
 	int iters = 3;
 	for (int i = 0; i < iters; i++) {
@@ -476,6 +480,7 @@ void _simulate_zmq_run(InitParams *init_params, InputParams *params) {
 		while (get_RCT_States(RCT_STATE_INDICATORS, params->num_threads, 1) != 0) {
 			Sleep(100);          //  Wait for RCT Threads to finish
 		}
+		//mergePartFiles(init_params, params, header);
 		printf("Request Completed\n");
 	}
 	
@@ -538,8 +543,8 @@ int _tmain(int argc, TCHAR * argv[]) {
 	==========================================================================================
 	*/
 	RCHeader *header = (RCHeader *)malloc(sizeof(RCHeader));
-	uint8_t *image_name = (uint8_t*)getFilenameFromPath(init_params->image_filename);
-	uint8_t *dark_name = (uint8_t*)getFilenameFromPath(init_params->dark_filename);
+	const char *image_name = getFilenameFromPath(init_params->image_filename);
+	const char *dark_name = getFilenameFromPath(init_params->dark_filename);
 	create_recode_header(params, -1, image_name, dark_name, &header);
 	print_recode_header(header);
 
@@ -590,8 +595,8 @@ int _tmain(int argc, TCHAR * argv[]) {
 			start_recode_server (init_params, params, header, darkFrame);
 		}
 		else {
-			start_zmq_server (init_params, params);
-			//_simulate_zmq_run(init_params, params);
+			//start_zmq_server (init_params, params, header);
+			_simulate_zmq_run(init_params, params, header);
 		}
 	}
 

@@ -19,7 +19,7 @@ queued_files = {}
 isFirst = True
 
 count = 0
-max_count = 660
+max_count = 3
 
 while(count < max_count-1):
 
