@@ -203,7 +203,7 @@ uint64_t getSEQFrames(uint8_t process_id, FILE* seqFile, uint16_t *buffer, uint6
 
 		uint64_t read_count = fread(&buffer[frame_count*n_PixelsInFrame], 2, n_PixelsInFrame, seqFile);
 
-		//recode_print("RCT %d:Read Count: %d; Num. Frames to Process: %d\n", process_id, read_count, n_Frames);
+		recode_print("RCT %d:Read Count: %d; Num. Frames to Process: %d\n", process_id, read_count, n_Frames);
 		if (read_count < n_PixelsInFrame) {
 			return frame_count;
 		}

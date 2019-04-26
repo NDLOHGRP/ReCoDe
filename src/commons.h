@@ -61,7 +61,7 @@ void getDarkMax (uint16_t *darkBuffer, DataSize h, uint16_t *darkFrame, uint8_t 
 	}
 	*/
 	
-	//#pragma omp parallel for num_threads(nThreads) collapse(2)
+	#pragma omp parallel for num_threads(nThreads) collapse(2)
 	for (row = 0; row < h.ny; row++) {
 		for (col = 0; col < h.nx; col++) {
 			pixel_index = row * h.nx + col;

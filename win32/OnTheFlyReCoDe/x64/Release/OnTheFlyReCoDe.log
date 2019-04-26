@@ -21,7 +21,17 @@ d:\cbis\github\recode\src\sequence_reader.h(171): warning C4244: 'argument': con
 d:\cbis\github\recode\src\sequence_reader.h(184): warning C4244: 'argument': conversion from 'uint64_t' to 'long', possible loss of data
 d:\cbis\github\recode\src\sequence_reader.h(198): warning C4244: 'argument': conversion from 'uint64_t' to 'long', possible loss of data
 d:\cbis\github\recode\src\sequence_reader.h(202): warning C4244: 'argument': conversion from 'uint64_t' to 'long', possible loss of data
+d:\cbis\github\recode\src\sequence_reader.h(206): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 2 has type 'uint64_t'
+  d:\cbis\github\recode\src\sequence_reader.h(206): note: consider using '%lld' in the format string
+  d:\cbis\github\recode\src\sequence_reader.h(206): note: consider using '%Id' in the format string
+  d:\cbis\github\recode\src\sequence_reader.h(206): note: consider using '%I64d' in the format string
+d:\cbis\github\recode\src\sequence_reader.h(206): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 3 has type 'uint64_t'
+  d:\cbis\github\recode\src\sequence_reader.h(206): note: consider using '%lld' in the format string
+  d:\cbis\github\recode\src\sequence_reader.h(206): note: consider using '%Id' in the format string
+  d:\cbis\github\recode\src\sequence_reader.h(206): note: consider using '%I64d' in the format string
 d:\cbis\github\recode\src\sequence_reader.h(283): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\commons.h(64): error C3005: 'collapse': unexpected token encountered on OpenMP 'parallel for' directive
+d:\cbis\github\recode\src\commons.h(64): error C3016: 'row': index variable in OpenMP 'for' statement must have signed integral type
 d:\cbis\github\recode\src\commons.h(10): warning C4477: 'printf' : format string '%lu' requires an argument of type 'unsigned long', but variadic argument 1 has type 'uint64_t'
   d:\cbis\github\recode\src\commons.h(10): note: consider using '%llu' in the format string
   d:\cbis\github\recode\src\commons.h(10): note: consider using '%Iu' in the format string
@@ -42,7 +52,6 @@ d:\cbis\github\recode\src\commons.h(140): warning C4477: 'printf' : format strin
   d:\cbis\github\recode\src\commons.h(140): note: consider using '%I32u' in the format string
 d:\cbis\github\recode\src\commons.h(221): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
 d:\cbis\github\recode\src\commons.h(241): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-d:\cbis\github\recode\src\commons.h(214): warning C4101: 'dark_subtracted_pixval': unreferenced local variable
 d:\cbis\github\recode\src\compressor.h(68): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
 d:\cbis\github\recode\src\compressor.h(112): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
 d:\cbis\github\recode\src\fileutils.h(90): warning C4244: 'initializing': conversion from 'uint64_t' to 'long', possible loss of data
@@ -69,8 +78,6 @@ d:\cbis\github\recode\src\L1.h(632): warning C4244: 'initializing': conversion f
 d:\cbis\github\recode\src\L1.h(636): warning C4244: 'initializing': conversion from 'double' to 'uint8_t', possible loss of data
 d:\cbis\github\recode\src\L1.h(645): warning C4244: '=': conversion from 'double' to 'uint64_t', possible loss of data
 d:\cbis\github\recode\src\L1.h(717): warning C4244: '+=': conversion from 'uint64_t' to 'uint16_t', possible loss of data
-d:\cbis\github\recode\src\L1.h(674): warning C4101: 'nth_bit_of_pth_pixval': unreferenced local variable
-d:\cbis\github\recode\src\L1.h(674): warning C4101: 't': unreferenced local variable
 d:\cbis\github\recode\src\L2.h(40): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
 d:\cbis\github\recode\src\L2.h(41): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
 d:\cbis\github\recode\src\L2.h(42): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
@@ -82,8 +89,6 @@ d:\cbis\github\recode\src\L2.h(116): warning C4018: '<': signed/unsigned mismatc
 d:\cbis\github\recode\src\L2.h(120): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
 d:\cbis\github\recode\src\L2.h(138): warning C4244: '/=': conversion from 'double' to 'float', possible loss of data
 d:\cbis\github\recode\src\L2.h(139): warning C4244: '/=': conversion from 'double' to 'float', possible loss of data
-d:\cbis\github\recode\src\L2.h(17): warning C4101: 'row': unreferenced local variable
-d:\cbis\github\recode\src\L2.h(17): warning C4101: 'col': unreferenced local variable
 d:\cbis\github\recode\src\L2.h(164): warning C4018: '<': signed/unsigned mismatch
 d:\cbis\github\recode\src\L2.h(216): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
 d:\cbis\github\recode\src\L2.h(226): warning C4244: 'initializing': conversion from 'uint64_t' to 'uint32_t', possible loss of data
@@ -112,8 +117,6 @@ d:\cbis\github\recode\src\L4.h(114): warning C4018: '<': signed/unsigned mismatc
 d:\cbis\github\recode\src\L4.h(118): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
 d:\cbis\github\recode\src\L4.h(136): warning C4244: '/=': conversion from 'double' to 'float', possible loss of data
 d:\cbis\github\recode\src\L4.h(137): warning C4244: '/=': conversion from 'double' to 'float', possible loss of data
-d:\cbis\github\recode\src\L4.h(17): warning C4101: 'row': unreferenced local variable
-d:\cbis\github\recode\src\L4.h(17): warning C4101: 'col': unreferenced local variable
 d:\cbis\github\recode\src\L4.h(184): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
 d:\cbis\github\recode\src\L4.h(194): warning C4244: 'initializing': conversion from 'uint64_t' to 'uint32_t', possible loss of data
 d:\cbis\github\recode\src\L4.h(207): warning C4244: 'initializing': conversion from 'uint64_t' to 'uint32_t', possible loss of data
@@ -126,39 +129,27 @@ d:\cbis\github\recode\src\L4.h(410): warning C4244: 'initializing': conversion f
 d:\cbis\github\recode\src\L4.h(429): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
 ..\..\src\fly.cpp(103): warning C4244: 'initializing': conversion from 'int64_t' to 'int', possible loss of data
 ..\..\src\fly.cpp(107): warning C4244: 'initializing': conversion from 'double' to 'uint64_t', possible loss of data
-..\..\src\fly.cpp(123): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
-..\..\src\fly.cpp(207): warning C4244: 'initializing': conversion from 'double' to 'uint64_t', possible loss of data
-..\..\src\fly.cpp(257): warning C4244: 'argument': conversion from 'unsigned short' to 'uint8_t', possible loss of data
-..\..\src\fly.cpp(257): warning C4244: 'argument': conversion from 'uint64_t' to 'uint32_t', possible loss of data
-..\..\src\fly.cpp(320): warning C4244: '=': conversion from 'float' to 'uint64_t', possible loss of data
-..\..\src\fly.cpp(321): warning C4244: '=': conversion from 'float' to 'uint64_t', possible loss of data
-..\..\src\fly.cpp(322): warning C4244: '=': conversion from 'float' to 'uint64_t', possible loss of data
-..\..\src\fly.cpp(323): warning C4244: '=': conversion from 'float' to 'uint64_t', possible loss of data
-..\..\src\fly.cpp(324): warning C4244: '=': conversion from 'float' to 'uint64_t', possible loss of data
-..\..\src\fly.cpp(215): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 2 has type 'uint64_t'
-  ..\..\src\fly.cpp(215): note: consider using '%lld' in the format string
-  ..\..\src\fly.cpp(215): note: consider using '%Id' in the format string
-  ..\..\src\fly.cpp(215): note: consider using '%I64d' in the format string
-..\..\src\fly.cpp(215): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 3 has type 'uint64_t'
-  ..\..\src\fly.cpp(215): note: consider using '%lld' in the format string
-  ..\..\src\fly.cpp(215): note: consider using '%Id' in the format string
-  ..\..\src\fly.cpp(215): note: consider using '%I64d' in the format string
-..\..\src\fly.cpp(227): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 2 has type 'uint64_t'
-  ..\..\src\fly.cpp(227): note: consider using '%lld' in the format string
-  ..\..\src\fly.cpp(227): note: consider using '%Id' in the format string
-  ..\..\src\fly.cpp(227): note: consider using '%I64d' in the format string
-..\..\src\fly.cpp(267): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 2 has type 'uint64_t'
-  ..\..\src\fly.cpp(267): note: consider using '%lld' in the format string
-  ..\..\src\fly.cpp(267): note: consider using '%Id' in the format string
-  ..\..\src\fly.cpp(267): note: consider using '%I64d' in the format string
-..\..\src\fly.cpp(288): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 2 has type 'uint64_t'
-  ..\..\src\fly.cpp(288): note: consider using '%lld' in the format string
-  ..\..\src\fly.cpp(288): note: consider using '%Id' in the format string
-  ..\..\src\fly.cpp(288): note: consider using '%I64d' in the format string
-  Generating code
-  10 of 74 functions (13.5%) were compiled, the rest were copied from previous compilation.
-    2 functions were new in current compilation
-    2 functions had inline decision re-evaluated but remain unchanged
-  Finished generating code
-  OnTheFlyReCoDe.vcxproj -> D:\cbis\GitHub\ReCoDe\win32\x64\Release\OnTheFlyReCoDe.exe
-  OnTheFlyReCoDe.vcxproj -> D:\cbis\GitHub\ReCoDe\win32\x64\Release\OnTheFlyReCoDe.pdb (Full PDB)
+..\..\src\fly.cpp(124): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
+..\..\src\fly.cpp(189): warning C4244: '=': conversion from 'float' to 'uint64_t', possible loss of data
+..\..\src\fly.cpp(190): warning C4244: '=': conversion from 'float' to 'uint64_t', possible loss of data
+..\..\src\fly.cpp(191): warning C4244: '=': conversion from 'float' to 'uint64_t', possible loss of data
+..\..\src\fly.cpp(192): warning C4244: '=': conversion from 'float' to 'uint64_t', possible loss of data
+..\..\src\fly.cpp(193): warning C4244: '=': conversion from 'float' to 'uint64_t', possible loss of data
+..\..\src\fly.cpp(234): warning C4244: 'initializing': conversion from 'double' to 'uint64_t', possible loss of data
+..\..\src\fly.cpp(284): warning C4244: 'argument': conversion from 'unsigned short' to 'uint8_t', possible loss of data
+..\..\src\fly.cpp(284): warning C4244: 'argument': conversion from 'uint64_t' to 'uint32_t', possible loss of data
+..\..\src\fly.cpp(323): warning C4244: '+=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
+..\..\src\fly.cpp(242): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 2 has type 'uint64_t'
+  ..\..\src\fly.cpp(242): note: consider using '%lld' in the format string
+  ..\..\src\fly.cpp(242): note: consider using '%Id' in the format string
+  ..\..\src\fly.cpp(242): note: consider using '%I64d' in the format string
+..\..\src\fly.cpp(242): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 3 has type 'uint64_t'
+  ..\..\src\fly.cpp(242): note: consider using '%lld' in the format string
+  ..\..\src\fly.cpp(242): note: consider using '%Id' in the format string
+  ..\..\src\fly.cpp(242): note: consider using '%I64d' in the format string
+..\..\src\fly.cpp(254): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 2 has type 'uint64_t'
+  ..\..\src\fly.cpp(254): note: consider using '%lld' in the format string
+  ..\..\src\fly.cpp(254): note: consider using '%Id' in the format string
+  ..\..\src\fly.cpp(254): note: consider using '%I64d' in the format string
+..\..\src\fly.cpp(562): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 1 has type 'std::size_t'
+  ..\..\src\fly.cpp(562): note: consider using '%zd' in the format string

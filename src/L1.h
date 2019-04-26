@@ -60,8 +60,8 @@ float binarize_and_get_pixvals (uint8_t	 process_id,
 		}
 	}
 	
-	//printf("No. of foreground pixels = %lu\n", *n_fg_pixels);
-	recode_print("RCT %d: No. of foreground pixels = %lu\n", process_id, *n_fg_pixels);
+	printf("No. of foreground pixels = %lu\n", *n_fg_pixels);
+	//recode_print("RCT %d: No. of foreground pixels = %lu\n", process_id, *n_fg_pixels);
 
 	clock_t p_end = clock();
 	float process_time = (p_end - p_start) * 1000.0 / CLOCKS_PER_SEC;
@@ -499,19 +499,19 @@ char* merge_RC1_Parts(const char* folderpath,
 			
 			uint32_t frame_id;
 			fread (&frame_id, sizeof(uint32_t), 1, partFiles[i]);
-			//printf("Frame ID: %d\n", frame_id);
+			printf("Frame ID: %d\n", frame_id);
 			
 			uint32_t nCompressedSize_BinaryImage;
 			fread (&nCompressedSize_BinaryImage, sizeof(uint32_t), 1, partFiles[i]);
-			//printf("Compressed Size 1: %d\n", nCompressedSize_BinaryImage);
+			printf("Compressed Size 1: %d\n", nCompressedSize_BinaryImage);
 			
 			uint32_t nCompressedSize_Pixvals;
 			fread (&nCompressedSize_Pixvals, sizeof(uint32_t), 1, partFiles[i]);
-			//printf("Compressed Size 2: %d\n", nCompressedSize_Pixvals);
+			printf("Compressed Size 2: %d\n", nCompressedSize_Pixvals);
 			
 			uint32_t bytesRequiredForPacking;
 			fread (&bytesRequiredForPacking, sizeof(uint32_t), 1, partFiles[i]);
-			//printf("Packed Bytes: %d\n", bytesRequiredForPacking);
+			printf("Packed Bytes: %d\n", bytesRequiredForPacking);
 			
 			fseek (partFiles[i], sizeof(uint8_t)*nCompressedSize_BinaryImage, SEEK_CUR);
 			
