@@ -545,10 +545,8 @@ char* merge_RC1_Parts(const char* folderpath,
 		fseek (partFiles[i], sizeof(uint8_t), SEEK_SET);
 	}
 	
-	
 	// write RC header to compressed_filename
 	serialize_recode_header (target_fp, rcHeader);
-	
 	
 	for (frame_id = 0; frame_id < total_frames; frame_id++) {
 		// write compressed frame sizes to compressed_filename
@@ -556,7 +554,6 @@ char* merge_RC1_Parts(const char* folderpath,
 		fwrite (&frame_data_sizes_map[frame_id*3+1], sizeof(uint32_t), 1, target_fp);
 		fwrite (&frame_data_sizes_map[frame_id*3+2], sizeof(uint32_t), 1, target_fp);
 	}
-	
 	
 	// copy actual data
 	uint32_t partfile_num;

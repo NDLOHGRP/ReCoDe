@@ -50,6 +50,7 @@ to run:		export OMP_NUM_THREADS=11
 #include "initparser.h"
 #include "recode_utils.h"
 #include "mrchandler.h"
+#include "sequence_reader.h"
 #include "commons.h"
 #include "compressor.h"
 #include "logger.h"
@@ -76,6 +77,7 @@ char* reduceCompress(
 	uint32_t    frame_start_index,
 	DataSize    h,
 	InputParams *params,
+	RCHeader    *header,
 	float 		*compression_time
 ) {
 
@@ -89,7 +91,7 @@ char* reduceCompress(
 		return reduceCompress_L3(process_id, original_filename, out_foldername, frameBuffer, darkFrame, frame_start_index, h, params, compression_time);
 	}
 	else if (params->reduction_level == 4) {
-		return reduceCompress_L4(process_id, original_filename, out_foldername, frameBuffer, darkFrame, frame_start_index, h, params, compression_time);
+		return reduceCompress_L4(process_id, original_filename, out_foldername, frameBuffer, darkFrame, frame_start_index, h, params, header, compression_time);
 	}
 	else {
 		printf("Error in function reduceCompress() in recode.cpp. ReCoDe has reduction levels 1 to 4. %d is not a supported level.\n", params->reduction_level);
@@ -112,7 +114,13 @@ void decompressExpand(const char* compressed_filename, uint16_t **frameBuffer, R
 		return decompressExpand_L3(fp, frameBuffer, header);
 	}
 	else if ((*header)->reduction_level == 4) {
-		return decompressExpand_L4(fp, frameBuffer, header);
+		if ((*header)->recode_operation_mode == 0) {
+			return decompressExpand_L4_Reduce_Only(fp, frameBuffer, header);
+		}
+		else if ((*header)->recode_operation_mode == 1) {
+			//return decompressExpand_L4_Reduce_Compress(fp, frameBuffer, header);
+			return _decompressExpand_L4(fp, frameBuffer, header);
+		}
 	}
 	else {
 		printf("Error in function decompressExpand() in recode.cpp. ReCoDe has reduction levels 1 to 4. %d is not a supported level. This could indicate that the source file is not a ReCoDe file.\n", (*header)->reduction_level);
@@ -130,7 +138,6 @@ int de (InitParams *init_params) {
 	uint16_t *de_frameBuffer16;
 	RCHeader *de_header = (RCHeader *)malloc(sizeof(RCHeader));
 	decompressExpand (init_params->image_filename, &de_frameBuffer16, &de_header);
-
 	
 	/*
 	========================================================================================== 
@@ -195,11 +202,10 @@ int rc (InitParams *init_params) {
 	==========================================================================================
 	*/
 	RCHeader *header = (RCHeader *)malloc(sizeof(RCHeader));
-	uint8_t *image_name = (uint8_t*)getFilenameFromPath (imageFile);
-	uint8_t *dark_name = (uint8_t*)getFilenameFromPath (darkFile);
+	const char *image_name = getFilenameFromPath (imageFile);
+	const char *dark_name = getFilenameFromPath (darkFile);
 	create_recode_header (params, -1, image_name, dark_name, &header);
 	print_recode_header (header);
-
 	
 	/*
 	========================================================================================== 
@@ -211,7 +217,7 @@ int rc (InitParams *init_params) {
 	uint16_t *frameBuffer = (uint16_t *)malloc(sz_frameBuffer);
 	
 	loadData(params->source_file_type, imageFile, frameBuffer, header->frame_offset, header->nz, b);
-	serializeFrames(frameBuffer, header->nx, header->ny, "image_frame.txt", 1);
+	//serializeFrames(frameBuffer, header->nx, header->ny, "image_frame.txt", 1);
 	recode_print("Image data loaded.\n");
 	
 	/*
@@ -231,7 +237,7 @@ int rc (InitParams *init_params) {
 		uint16_t *darkBuffer = (uint16_t *)malloc(sz_darkBuffer);
 		
 		loadData (params->dark_file_type, darkFile, darkBuffer, 0, header->num_dark_frames, d);
-		serializeFrames(darkBuffer, header->nx, header->ny, "dark_frame.txt", 1);
+		//serializeFrames(darkBuffer, header->nx, header->ny, "dark_frame.txt", 1);
 		printf("Dark data loaded.\n");
 		
 		getDarkMax (darkBuffer, d, darkFrame, params->num_threads);
@@ -239,12 +245,11 @@ int rc (InitParams *init_params) {
 		
 		printf("Dark noise estimation complete.\n");
 		
-		
 	} else {
 		
 		DataSize d1 = { header->nx, header->ny, 1, params->source_bit_depth };
 		loadData (params->dark_file_type, darkFile, darkFrame, 0, 1, d1);
-		serializeFrames(darkFrame, header->nx, header->ny, "dark_frame.txt", 1);
+		//serializeFrames(darkFrame, header->nx, header->ny, "dark_frame.txt", 1);
 		printf("Pre-computed dark noise estimates loaded.\n");
 		
 	}
@@ -313,6 +318,7 @@ int rc (InitParams *init_params) {
 														frame_start_indices[part_num], 
 														part_b, 
 														params,
+														header,
 														compress_times_sizes_best_speed
 													);		// best speed
 													
@@ -338,21 +344,14 @@ int rc (InitParams *init_params) {
 	==========================================================================================
 	*/
 	printf("Merging part files.\n");
-	if (params->num_threads == 1) {
-		char* extension;
-		if (params->reduction_level == 1) {
-			extension = ".rc1";
-		} else if (params->reduction_level == 2) {
-			extension = ".rc2";
-		} else if (params->reduction_level == 3) {
-			extension = ".rc3";
-		} else if (params->reduction_level == 4) {
-			extension = ".rc4";
-		}
-		const char* compressed_filename = concat(concat(outDir, (const char*)image_name), extension);
-		rename(concat(outDir, part_filenames[0]), compressed_filename);
-	} else {
+	if (params->reduction_level == 1) {
 		char* fname = merge_RC1_Parts(outDir, part_filenames, params->num_threads, header, concat(outDir, (const char*)image_name));
+	} else if (params->reduction_level == 2) {
+		//char* fname = merge_RC2_Parts(outDir, part_filenames, params->num_threads, header, concat(outDir, (const char*)image_name));
+	} else if (params->reduction_level == 3) {
+		//char* fname = merge_RC3_Parts(outDir, part_filenames, params->num_threads, header, concat(outDir, (const char*)image_name));
+	} else if (params->reduction_level == 4) {
+		char* fname = merge_RC4_Parts(outDir, part_filenames, header, params, concat(outDir, (const char*)image_name));
 	}
 	printf("Done.\n");
 	
@@ -376,6 +375,29 @@ int rc (InitParams *init_params) {
 	return 0;
 }
 
+
+#ifdef _WIN32
+int _tmain(int argc, TCHAR * argv[]) {
+	InitParams *init_params = (InitParams *)malloc(sizeof(InitParams));
+	parse_init_params(argc, argv, &init_params);
+
+	VERBOSITY = init_params->verbosity;
+
+	if (init_params->mode == 0) {
+		rc(init_params);
+	}
+	else if (init_params->mode == 1) {
+		de(init_params);
+	}
+	else {
+		printf("Failed to initialize. Unknown mode: %d. Acceptable modes are: -rc and -de", init_params->mode);
+		fprintf(stderr, "Usage::\n");
+		fprintf(stderr, "./recode -rc <input image filename> <dark image filename> <input parameter filename> <output directory>\n");
+		fprintf(stderr, "./recode -de <recode filename> <output directory>\n");
+		exit(0);
+	}
+}
+#else
 int main(int argc, char *argv[]) {
 
 	InitParams *init_params = (InitParams *)malloc(sizeof(InitParams));
@@ -397,7 +419,8 @@ int main(int argc, char *argv[]) {
 	}
 
 }
-
+#endif
+/*
 extern "C"
 {
 	__declspec(dllexport) int py_rc(const char *image_filename, const char *dark_filename, const char *params_filename, const char *output_directory, uint8_t verbosity);
@@ -447,3 +470,5 @@ uint16_t* py_de(const char *recode_filename, const char *output_directory, uint8
 	}
 	return darkBuffer;
 }
+
+*/

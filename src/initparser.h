@@ -105,6 +105,7 @@ void ShowReCoDeServerUsage() {
 	printf("-v:     Verbosity level (0 or 1, Optional)\n");
 	printf("-l:     Log file name (Optional)\n");
 	printf("-n:     Run name (Optional). Used while logging.\n");
+	printf("-vf:    Gap between validation frames. (Optional). If not specified no validation frames are saved.\n");
 	printf("-h:     Displays this help (Optional)\n");
 	printf("-help:  Displays this help (Optional)\n");
 	printf("--help: Displays this help (Optional)\n");
@@ -212,3 +213,121 @@ int parse_recode_server_init_params (int argc, TCHAR * argv[], InitParams **init
 	recode_print("run_name = %s\n", (*init_params)->run_name);
 	recode_print("validation_frame_gap = %d\n", (*init_params)->validation_frame_gap);
 }
+
+int parse_init_params(int argc, TCHAR * argv[], InitParams **init_params) {
+
+	// declare our options parser, pass in the arguments from main
+	// as well as our array of valid options.
+	CSimpleOpt args(argc, argv, g_rgOptions);
+
+	(*init_params)->verbosity = 0;
+	(*init_params)->log_filename = "recode.log";
+	(*init_params)->run_name = "Run";
+	(*init_params)->validation_frame_gap = -1;
+	(*init_params)->mode = -1;
+
+	// while there are arguments left to process
+	while (args.Next()) {
+
+		if (args.LastError() != SO_SUCCESS) {
+			_tprintf(_T("%s: '%s' (use --help to get command line help)\n"), GetLastErrorText(args.LastError()), args.OptionText());
+			continue;
+		}
+
+		switch (args.OptionId()) {
+			printf("%s", args.OptionId());
+			case OPT_HELP:
+				ShowUsage();
+				return 0;
+			case OPT_RC:
+				if ((*init_params)->mode == -1) {
+					(*init_params)->mode = 0;
+				}
+				else {
+					printf("-rc and -de options cannot be used simultaneously.\n");
+					return 0;
+				}
+				break;
+			case OPT_DE:
+				if ((*init_params)->mode == -1) {
+					(*init_params)->mode = 1;
+				}
+				else {
+					printf("-rc and -de options cannot be used simultaneously.\n");
+					return 0;
+				}
+				break;
+			case ARG_VERB:
+				(*init_params)->verbosity = wchar_to_int(args.OptionArg());
+				break;
+			case ARG_IMG:
+				(*init_params)->image_filename = wchar_to_char(args.OptionArg());
+				break;
+			case ARG_DRK:
+				(*init_params)->dark_filename = wchar_to_char(args.OptionArg());
+				break;
+			case ARG_PRM:
+				(*init_params)->params_filename = wchar_to_char(args.OptionArg());
+				break;
+			case ARG_DIR:
+				(*init_params)->output_directory = wchar_to_char(args.OptionArg());
+				break;
+			case ARG_LOG:
+				(*init_params)->log_filename = wchar_to_char(args.OptionArg());
+				break;
+			case ARG_NAM:
+				(*init_params)->run_name = wchar_to_char(args.OptionArg());
+				break;
+			case ARG_VAF:
+				(*init_params)->validation_frame_gap = wchar_to_int(args.OptionArg());
+				break;
+			default:
+				return 0;
+		}
+	}
+
+	int params_check_cleared = 1;
+	if ((*init_params)->mode == -1) {
+		printf("Missing Parameter: Specify -rc or -de.\n");
+		params_check_cleared = 0;
+	}
+	if ((*init_params)->output_directory == NULL) {
+		printf("Missing Parameter Output Directory: Use -o option to specify.\n");
+		params_check_cleared = 0;
+	}
+	if ((*init_params)->image_filename == NULL) {
+		printf("Missing Parameter Image File: Use -i option to specify.\n");
+		params_check_cleared = 0;
+	}
+	if ((*init_params)->mode == 0 && (*init_params)->dark_filename == NULL) {
+		printf("Missing Parameter Dark File: Use -o option to specify.\n");
+		params_check_cleared = 0;
+	}
+	if ((*init_params)->mode == 0 && (*init_params)->params_filename == NULL) {
+		printf("Missing Parameter Params File: Use -p option to specify.\n");
+		params_check_cleared = 0;
+	}
+	if ((*init_params)->verbosity > 1) {
+		(*init_params)->verbosity = 1;
+	}
+
+	if (params_check_cleared == 0) {
+		ShowReCoDeServerUsage();
+		exit(0);
+	}
+
+	/*
+	recode_print("ReCoDe Server Input Parameters:\n");
+	recode_print("image_filename = %s\n", (*init_params)->image_filename);
+	recode_print("verbosity = %d\n", (*init_params)->verbosity);
+	recode_print("output_directory = %s\n", (*init_params)->output_directory);
+	recode_print("dark_filename = %s\n", (*init_params)->dark_filename);
+	recode_print("params_filename = %s\n", (*init_params)->params_filename);
+	recode_print("log_filename = %s\n", (*init_params)->log_filename);
+	recode_print("run_name = %s\n", (*init_params)->run_name);
+	recode_print("validation_frame_gap = %d\n", (*init_params)->validation_frame_gap);
+	*/
+}
+
+
+

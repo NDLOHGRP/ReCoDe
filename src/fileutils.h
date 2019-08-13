@@ -1,6 +1,6 @@
 #define MAX_PART_FILE_NAME_LENGTH	100
 
-void writeToFile (const char* filename, unsigned char* data, int dataLength) {
+void writeToFile (const char *filename, uint8_t *data, int dataLength) {
 	
 	FILE * fp;
 	fp = fopen (filename, "w+");

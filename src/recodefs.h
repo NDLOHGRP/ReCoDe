@@ -2,6 +2,7 @@
 #define VERSION_MINOR				1
 
 #define MAX_FILENAME_LENGTH			100
+#define RC_HEADER_LENGTH			321
 
 #define RC_MODE_REDUCE_ONLY			0
 #define RC_MODE_REDUCE_COMPRESS		1
