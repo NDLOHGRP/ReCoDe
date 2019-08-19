@@ -183,7 +183,7 @@ void reduceCompressFrame_L4 (	uint8_t	 process_id,
 	
 	// Dark Subtraction
 	uint32_t n_fg_pixels = 0;
-	uint32_t frame_start_index = z * h.nx * h.ny;
+	uint64_t frame_start_index = z * h.nx * h.ny;
 		
 	thresh_time = get_foreground_image (frameBuffer + frame_start_index, darkFrame, epsilon_s, h, &n_fg_pixels, foregroundImage, foregroundTernaryMap);
 	
@@ -205,7 +205,10 @@ void reduceCompressFrame_L4 (	uint8_t	 process_id,
 
 	clock_t p_end = clock();
 	float reduction_time = (p_end - p_start) * 1000.0 / CLOCKS_PER_SEC;
-	
+	if (frame_id % 100 == 0) {
+		recode_print("RCT %d: Num. Electron Events in Frame %d: %" PRIu32 ", Est. Dose Rate: %f e/pixel/frame\n", process_id, frame_id, n_labels, (n_labels / (h.nx*h.ny)));
+	}
+
 	/*
 	========================================================================================== 
 	Compress
@@ -310,6 +313,7 @@ char* reduceCompress_L4 (uint8_t	 process_id,
 				fwrite(&n_compressed_bytes, sizeof(uint32_t), 1, fp);
 				fwrite(compressedCentroidImage, sizeof(uint8_t), n_compressed_bytes, fp);
 			}
+
 		}
 
 		// serialize the number of frames in the header
@@ -330,7 +334,7 @@ char* reduceCompress_L4 (uint8_t	 process_id,
 		return part_filename;
 }
 
-char* merge_RC4_Parts(	const char* folderpath,
+char* merge_RC4_Parts(	const char*	 folderpath,
 						char**       part_filenames,
 						RCHeader 	 *rcHeader,
 						InputParams  *input_params,
@@ -415,7 +419,6 @@ char* merge_RC4_Parts(	const char* folderpath,
 	}
 
 	// copy actual data
-	uint32_t temp;
 	uint32_t partfile_num;
 	uint32_t f_sz;
 	uint8_t *compressedBinaryImage = (uint8_t*)calloc(n_bytes_in_binary_image, sizeof(uint8_t));
@@ -456,7 +459,7 @@ char* merge_RC4_Parts(	const char* folderpath,
 	return (char*)compressed_filename;
 }
 
-void decompressExpand_L4_Reduce_Compress(FILE* fp, uint16_t **frameBuffer, RCHeader **header) {
+void decompressExpand_L4_Reduced_Compressed(FILE* fp, uint16_t **frameBuffer, RCHeader **header) {
 
 	uint32_t nx = (*header)->nx;
 	uint32_t ny = (*header)->ny;
@@ -475,7 +478,7 @@ void decompressExpand_L4_Reduce_Compress(FILE* fp, uint16_t **frameBuffer, RCHea
 	}
 
 	uint8_t *compressedBinaryImage = (uint8_t*)calloc(n_bytes_in_binary_image, sizeof(uint8_t));
-	uint8_t* deCompressedBinaryImage = (uint8_t*)calloc(n_bytes_in_binary_image, sizeof(uint8_t));
+	uint8_t *deCompressedBinaryImage = (uint8_t*)calloc(n_bytes_in_binary_image, sizeof(uint8_t));
 
 	// read frames
 	for (frame_id = 0; frame_id < nz; frame_id++) {
@@ -506,7 +509,7 @@ void decompressExpand_L4_Reduce_Compress(FILE* fp, uint16_t **frameBuffer, RCHea
 	}
 }
 
-void decompressExpand_L4_Reduce_Only (FILE* fp, uint16_t **frameBuffer, RCHeader **header) {
+void decompressExpand_L4_Reduced_Only (FILE* fp, uint16_t **frameBuffer, RCHeader **header) {
 
 	uint32_t nx = (*header)->nx;
 	uint32_t ny = (*header)->ny;

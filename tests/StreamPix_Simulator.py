@@ -21,7 +21,7 @@ ITERATIONS = 4
 THROUGHPUT_IN_SECS_PER_CHUNK = 5
 
 source_directory = "D:\\cbis\\GitHub\\ReCoDe\\scratch\\temp"
-target_directory = "R:\\"
+target_directory = "R:\\DE-16"
 
 # copy all files from source directory to temp directory
 f_list = [f for f in os.listdir(source_directory) if isfile(join(source_directory, f)) and f.endswith(".seq")]

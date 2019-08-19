@@ -6,7 +6,7 @@ import zmq
 import queue
 
 # path = "R:\\"
-path = "R:\DE16"
+path = "R:\DE-16"
 
 context = zmq.Context()
 print ("Connecting to server...")

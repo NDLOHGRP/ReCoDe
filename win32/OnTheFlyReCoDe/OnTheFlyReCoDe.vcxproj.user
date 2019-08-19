@@ -5,7 +5,11 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LocalDebuggerCommandArguments>-d "D:\cbis\images\20161207\12-23-00.232 - Copy.seq" -o "D:\cbis\GitHub\ReCoDe\scratch\_" -p "D:\cbis\GitHub\ReCoDe\config\recode_params.txt" -i abc -l recode.log -n run1 -v 1 -vf 25</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-d "D:\cbis\GitHub\ReCoDe\data\Dark_Frame_12-23-00.232.bin" -o "D:\cbis\GitHub\ReCoDe\scratch\_" -p "D:\cbis\GitHub\ReCoDe\config\recode_params.txt" -i abc -l recode.log -n run1 -v 1 -vf 10</LocalDebuggerCommandArguments>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LocalDebuggerCommandArguments>-d "D:\cbis\GitHub\ReCoDe\data\Dark_Frame_12-23-00.232.bin" -o "D:\cbis\GitHub\ReCoDe\scratch\_" -p "D:\cbis\GitHub\ReCoDe\config\recode_params.txt" -i abc -l recode.log -n run1 -v 1 -vf 10</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>

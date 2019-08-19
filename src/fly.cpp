@@ -5,9 +5,9 @@ to compile with profiling: kinst-ompp-papi gcc multifly.c -lz -O3 -o fly -lm -fo
 to run:        ./fly
 
 -lz:     links zlib
--lbz2:     links bzip2
+-lbz2:   links bzip2
 -lm:     links math.h NOTE: it is important to keep -lm as the last option
--o:         write build output to file
+-o:      write build output to file
 -O3:     optimizer flag
 **************************************************************************************************************/
 
@@ -130,6 +130,29 @@ void runRCT_L1(
 	uint8_t  *compressedPackedPixvals = (uint8_t*)malloc(n_pixels_in_frame * sizeof(uint8_t));
 	uint8_t  *compressed_frame = (uint8_t*)malloc(n_pixels_in_frame * sizeof(uint8_t));
 
+	/*============== temporary variables for counting on validation frames ===========
+	only used if params->reduction_level == 1 or params->reduction_level == 3
+	all variables usd in validation counting use _vc prefix
+	=================================================================================*/
+	uint64_t _vc_frame_start_index;
+	uint32_t _vc_n_fg_pixels, _vc_n_labels;
+	DataSize _vc_h = { 128, 128, 1, params->source_bit_depth };
+	if (header->nx < 128) {
+		_vc_h.nx = header->nx;
+	}
+	if (header->ny < 128) {
+		_vc_h.ny = header->ny;
+	}
+	uint32_t _vc_left = (uint32_t)floor((header->nx - _vc_h.nx) / 2.0);
+	uint32_t _vc_top = (uint32_t)floor((header->ny - _vc_h.ny) / 2.0);
+	uint32_t _vc_roi_top_left = header->nx * _vc_top + _vc_left;
+	uint32_t _vc_n_pixels_in_frame = _vc_h.nx * _vc_h.ny;
+	float *_vc_x_coor = (float *)malloc(_vc_n_pixels_in_frame * sizeof(float));
+	float *_vc_y_coor = (float *)malloc(_vc_n_pixels_in_frame * sizeof(float));
+	uint16_t *_vc_foregroundImage = (uint16_t *)calloc(_vc_n_pixels_in_frame, sizeof(uint16_t));
+	int8_t   *_vc_foregroundTernaryMap = (int8_t *)calloc(_vc_n_pixels_in_frame, sizeof(int8_t));
+	/*============== temporary variables for counting on validation frames ===========*/
+
 	const char* filename = makePartFilename(process_id, name, params->reduction_level);
 	char* bfilename = concat(destination_directory, filename);
 	printf("RCT: %d: Will be using part file '%s'\n", process_id, bfilename);
@@ -140,7 +163,10 @@ void runRCT_L1(
 		exit(1);
 	}
 	int FD = fileno(partFile);
-	fwrite(&process_id, sizeof(char), 1, partFile);        // write process_id to partfile
+
+	// serialize header
+	serialize_recode_header(partFile, header);
+	//fwrite(&process_id, sizeof(char), 1, partFile);        // write process_id to partfile
 
 	FILE *validationFile;
 	if (validation_frame_gap > 0) {
@@ -168,8 +194,15 @@ void runRCT_L1(
 
 				recode_print("RCT %d: Clearing buffer and closing files...\n", process_id);
 				fwrite(pBuffer, sizeof(char), RCT_Buffer_Fill_Position, partFile);
-				fwrite(&num_frames_in_part, sizeof(uint32_t), 1, partFile);		// serialize the number of frames at the end
+				//fwrite(&num_frames_in_part, sizeof(uint32_t), 1, partFile);		// serialize the number of frames at the end
 				nWrites++;
+
+				// serialize the number of frames in the header
+				fseek(partFile, 17, SEEK_SET);
+				fwrite(&num_frames_in_part, sizeof(uint32_t), 1, partFile);
+				fseek(partFile, 277, SEEK_SET);
+				fwrite(&process_id, sizeof(uint8_t), 1, partFile);
+
 				fclose(partFile);
 				if (validation_frame_gap > 0) {
 					fclose(validationFile);
@@ -237,6 +270,21 @@ void runRCT_L1(
 
 			// Load data for this thread
 			uint64_t available_frames = getSEQFrames(process_id, fp, frameBuffer, frame_offset, num_frames_to_process, seq_header);
+			/*===============Testing===============
+			uint64_t i, j, frame_start_index, linear_index;
+			uint16_t max_val = 0;
+			int x[] = { 99, 1111, 2222, 3333, 4000 };
+			int y[] = { 110, 220, 330, 440, 500 };
+			for (i = 0; i < available_frames; i++) {
+				frame_start_index = i* header->nx * header->ny;
+				printf("Frame %" PRIu64 ": ", i + frame_offset);
+				for (j = 0; j < 5; j++) {
+					linear_index = y[j] * header->nx + x[j];
+					printf("%d,%d=%" PRIu16 ", ", y[j], x[j], frameBuffer[frame_start_index + linear_index]);
+				}
+				printf("\n");
+			}
+			/*===============Testing===============*/
 			fclose(fp);
 
 			recode_print("RCT %d: Available Frames: %d; Num. Frames to Process: %d\n", process_id, available_frames, num_frames_to_process);
@@ -252,6 +300,17 @@ void runRCT_L1(
 						fwrite(&absolute_frame_index, sizeof(uint64_t), 1, validationFile);
 						fwrite(&frameBuffer[count*n_pixels_in_frame], sizeof(uint16_t), n_pixels_in_frame, validationFile);
 						recode_print("RCT %d: Saving frame: %d\n", process_id, absolute_frame_index);
+						if (params->reduction_level == 1 || params->reduction_level == 3) {
+							// Dark Subtraction
+							_vc_n_fg_pixels = 0;
+							_vc_frame_start_index = count*n_pixels_in_frame + _vc_roi_top_left;
+							get_foreground_image(frameBuffer + _vc_frame_start_index, darkFrame + _vc_roi_top_left, params->dark_threshold_epsilon, _vc_h, &_vc_n_fg_pixels, _vc_foregroundImage, _vc_foregroundTernaryMap);
+							// Connected Components Analysis to get (binary) Centroid Image
+							uint32_t _temp_n_labels;
+							cca(_vc_foregroundImage, _vc_foregroundTernaryMap, frameBuffer + _vc_frame_start_index, darkFrame + _vc_roi_top_left, params->dark_threshold_epsilon, _vc_h, _vc_n_fg_pixels, _vc_x_coor, _vc_y_coor, &_vc_n_labels);
+							float _vc_dose_rate = (float)_vc_n_labels / (_vc_h.nx*_vc_h.ny);
+							recode_print("RCT %d: Num. Electron Events in Selected RoI of Frame %d: %" PRIu32 ", Est. Dose Rate: %f e/pixel/frame\n", process_id, absolute_frame_index, _vc_n_labels, _vc_dose_rate);
+						}
 					}
 				}
 				
@@ -421,7 +480,7 @@ void mergePartFiles(InitParams *init_params, InputParams *params, RCHeader *head
 	for (part_num = 0; part_num < params->num_threads; part_num++) {
 		part_filenames[part_num] = makePartFilename(part_num, init_params->run_name, params->reduction_level);
 	}
-	merge_RC1_Parts(init_params->output_directory, part_filenames, params->num_threads, header, compressed_filename);
+	merge_RC1_Parts(init_params->output_directory, part_filenames, header, params, compressed_filename);
 }
 
 int start_zmq_server(InitParams *init_params, InputParams *params, RCHeader *header) {
@@ -470,14 +529,15 @@ void _simulate_zmq_run(InitParams *init_params, InputParams *params, RCHeader *h
 	for (int i = 0; i < iters; i++) {
 		printf("ReCoDe Server: Received Request %d, processing: %d\n", i, i);
 		reset_run_stats();
-		IMAGE_FILENAME = "R:\\003.seq";
+		//IMAGE_FILENAME = "R:\\003.seq";
 		//IMAGE_FILENAME = "D:\\cbis\\GitHub\\ReCoDe\\scratch\\temp\\003.seq";
+		IMAGE_FILENAME = "D:\\cbis\\images\\SequenceBlocks\\17-21-33.138_Dark_Ref_3.seq";
 		set_RCT_States(RCT_STATE_INDICATORS, params->num_threads, 1);
 		Sleep(3000);
 		while (get_RCT_States(RCT_STATE_INDICATORS, params->num_threads, 1) != 0) {
 			Sleep(100);          //  Wait for RCT Threads to finish
 		}
-		mergePartFiles(init_params, params, header);
+		//mergePartFiles(init_params, params, header);
 		printf("Request Completed\n");
 	}
 	
@@ -493,9 +553,11 @@ void _simulate_zmq_run(InitParams *init_params, InputParams *params, RCHeader *h
 #ifdef _WIN32
 int _tmain(int argc, TCHAR * argv[]) {
 
-	/*
-	const char* filename = "D:/cbis/images/20161207/14-37-50.811.seq";
-	DataSize d = { 4096, 512, 50, 12 };
+	/*====================Testing========================*/
+	//const char* filename = "D:/cbis/images/20161207/14-37-50.811.seq";
+	//const char* filename = "Z:/26-April-2019/Live_Acquisition_1/RamDisk_LeftOver/15-10-17.540.seq";
+	const char* filename = "D:/cbis/images/SequenceBlocks/17-21-33.138_Dark_Ref_3.seq";
+	DataSize d = { 4096, 512, 2000, 12 };
 	uint64_t sz_darkBuffer = d.nx * d.ny * d.nz * sizeof(uint16_t);
 	uint16_t *darkBuffer = (uint16_t *)malloc(sz_darkBuffer);
 	
@@ -506,12 +568,32 @@ int _tmain(int argc, TCHAR * argv[]) {
 		exit(1);
 	}
 	getSEQHeader(fp, &seq_header);
-	uint64_t available_frames = getSEQFrames(fp, darkBuffer, 300, 50, seq_header);
+	uint64_t frame_offset = 0;
+	uint64_t available_frames = getSEQFrames(0, fp, darkBuffer, frame_offset, d.nz, seq_header);
+	printf("Available Frames = %" PRIu64 "\n", available_frames);
+	uint64_t i, j, frame_start_index, linear_index;
+	uint16_t max_val = 0;
+	int x[] = { 99, 1111, 2222, 3333, 4000 };
+	int y[] = { 110, 220, 330, 440, 500 };
+	for (i = 0; i <  available_frames; i++) {
+		frame_start_index = i*d.nx*d.ny;
+		printf("Frame %" PRIu64 ": ", i + frame_offset);
+		for (j = 0; j < 5; j++) {
+			linear_index = y[j] * d.nx + x[j];
+			printf("%d,%d=%" PRIu16 ", ", y[j], x[j], darkBuffer[frame_start_index + linear_index]);
+		}
+		printf("\n");
+	}
+	printf("Max = %" PRIu16 "\n", max_val);
 	fclose(fp);
-	
+
+	exit(0);
+
+	/*
 	createSEQFiles(darkBuffer, seq_header, 50, "D:/cbis/GitHub/ReCoDe/scratch/temp/", 10);
 	return 0;
 	*/
+	/*====================Testing========================*/
 
 	omp_set_nested(1);
 
@@ -594,8 +676,8 @@ int _tmain(int argc, TCHAR * argv[]) {
 			start_recode_server (init_params, params, header, darkFrame);
 		}
 		else {
-			start_zmq_server (init_params, params, header);
-			//_simulate_zmq_run(init_params, params, header);
+			//start_zmq_server (init_params, params, header);
+			_simulate_zmq_run(init_params, params, header);
 		}
 	}
 

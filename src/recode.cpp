@@ -82,7 +82,7 @@ char* reduceCompress(
 ) {
 
 	if (params->reduction_level == 1) {
-		return reduceCompress_L1(process_id, original_filename, out_foldername, frameBuffer, darkFrame, frame_start_index, h, params, compression_time);
+		return reduceCompress_L1(process_id, original_filename, out_foldername, frameBuffer, darkFrame, frame_start_index, h, params, header, compression_time);
 	}
 	else if (params->reduction_level == 2) {
 		return reduceCompress_L2(process_id, original_filename, out_foldername, frameBuffer, darkFrame, frame_start_index, h, params, compression_time);
@@ -105,7 +105,12 @@ void decompressExpand(const char* compressed_filename, uint16_t **frameBuffer, R
 	parse_recode_header(fp, header);
 
 	if ((*header)->reduction_level == 1) {
-		return decompressExpand_L1(fp, frameBuffer, header);
+		if ((*header)->recode_operation_mode == 0) {
+			return decompressExpand_L1_Reduced_Only(fp, frameBuffer, header);
+		}
+		else if ((*header)->recode_operation_mode == 1) {
+			return decompressExpand_L1_Reduced_Compressed(fp, frameBuffer, header);
+		}
 	}
 	else if ((*header)->reduction_level == 2) {
 		return decompressExpand_L2(fp, frameBuffer, header);
@@ -115,10 +120,10 @@ void decompressExpand(const char* compressed_filename, uint16_t **frameBuffer, R
 	}
 	else if ((*header)->reduction_level == 4) {
 		if ((*header)->recode_operation_mode == 0) {
-			return decompressExpand_L4_Reduce_Only(fp, frameBuffer, header);
+			return decompressExpand_L4_Reduced_Only(fp, frameBuffer, header);
 		}
 		else if ((*header)->recode_operation_mode == 1) {
-			//return decompressExpand_L4_Reduce_Compress(fp, frameBuffer, header);
+			//return decompressExpand_L4_Reduced_Compressed(fp, frameBuffer, header);
 			return _decompressExpand_L4(fp, frameBuffer, header);
 		}
 	}
@@ -150,8 +155,9 @@ int de (InitParams *init_params) {
     char *out_fname = concat(outDir, concat("Recoded_", s));
     
     printf("to %s\n", out_fname);
-	FILE *fp = fopen (out_fname, "w+");
+	FILE *fp = fopen (out_fname, "wb+");
 	uint32_t n_pixels = de_header->nx * de_header->ny * de_header->nz;
+
 	fwrite (de_frameBuffer16, sizeof(uint16_t), n_pixels, fp);
 	fclose(fp);
 	printf("Done.\n");
@@ -164,6 +170,62 @@ int de (InitParams *init_params) {
 	free(s);
 	free(de_header);
 	free(de_frameBuffer16);
+
+	return 0;
+}
+
+int mr (InitParams *init_params) {
+
+	// read and validate input parameters
+	InputParams *params = (InputParams *)malloc(sizeof(InputParams));
+	get_input_params(init_params->params_filename, &params);
+
+	/*
+	==========================================================================================
+	Process Inputs
+	==========================================================================================
+	*/
+	char *darkFile = init_params->dark_filename;
+	char *imageFile = init_params->image_filename;
+	char *outDir = format_directory_path(init_params->output_directory);
+
+	/*
+	==========================================================================================
+	Create ReCoDE header
+	==========================================================================================
+	*/
+	RCHeader *header = (RCHeader *)malloc(sizeof(RCHeader));
+	const char *image_name = getFilenameFromPath(imageFile);
+	const char *dark_name = getFilenameFromPath(darkFile);
+	create_recode_header(params, -1, image_name, "", &header);
+	print_recode_header(header);
+
+	char** part_filenames = (char**)malloc((params->num_threads) * sizeof(char*));
+	int part_num;
+	for (part_num = 0; part_num < params->num_threads; part_num++) {
+		part_filenames[part_num] = (char*)malloc(MAX_PART_FILE_NAME_LENGTH * sizeof(char));
+		part_filenames[part_num] = makePartFilename(part_num, init_params->run_name, 1);
+	}
+
+	/*
+	==========================================================================================
+	Merge part-files
+	==========================================================================================
+	*/
+	printf("Merging part files.\n");
+	if (params->reduction_level == 1) {
+		char* fname = merge_RC1_Parts(outDir, part_filenames, header, params, concat(outDir, (const char*)image_name));
+	}
+	else if (params->reduction_level == 2) {
+		//char* fname = merge_RC2_Parts(outDir, part_filenames, params->num_threads, header, concat(outDir, (const char*)image_name));
+	}
+	else if (params->reduction_level == 3) {
+		//char* fname = merge_RC3_Parts(outDir, part_filenames, params->num_threads, header, concat(outDir, (const char*)image_name));
+	}
+	else if (params->reduction_level == 4) {
+		char* fname = merge_RC4_Parts(outDir, part_filenames, header, params, concat(outDir, (const char*)image_name));
+	}
+	printf("Done.\n");
 
 	return 0;
 }
@@ -345,7 +407,7 @@ int rc (InitParams *init_params) {
 	*/
 	printf("Merging part files.\n");
 	if (params->reduction_level == 1) {
-		char* fname = merge_RC1_Parts(outDir, part_filenames, params->num_threads, header, concat(outDir, (const char*)image_name));
+		char* fname = merge_RC1_Parts(outDir, part_filenames, header, params, concat(outDir, (const char*)image_name));
 	} else if (params->reduction_level == 2) {
 		//char* fname = merge_RC2_Parts(outDir, part_filenames, params->num_threads, header, concat(outDir, (const char*)image_name));
 	} else if (params->reduction_level == 3) {
@@ -378,6 +440,7 @@ int rc (InitParams *init_params) {
 
 #ifdef _WIN32
 int _tmain(int argc, TCHAR * argv[]) {
+
 	InitParams *init_params = (InitParams *)malloc(sizeof(InitParams));
 	parse_init_params(argc, argv, &init_params);
 
@@ -388,6 +451,9 @@ int _tmain(int argc, TCHAR * argv[]) {
 	}
 	else if (init_params->mode == 1) {
 		de(init_params);
+	}
+	else if (init_params->mode == 2) {
+		mr(init_params);
 	}
 	else {
 		printf("Failed to initialize. Unknown mode: %d. Acceptable modes are: -rc and -de", init_params->mode);

@@ -27,13 +27,13 @@ Source_Bit_Depth = 12
 # Frame dimensions
 # If source file is MRC, these parameters are read from MRC header, else user provided values are used
 Num_Cols = 4096
-Num_Rows = 4096
+Num_Rows = 512
 
 # Number of frames to extract from dataset i
 # If source file is MRC and the user provided value is -1, the number of frames as per MRC header is used
 # If source file is MRC and the user provided value is not -1, the user specified number of frames are read
 # If source file is not MRC this value has to be explicitly provided
-Num_Frames = 50
+Num_Frames = 4
 
 # Number of frames to skip in the original data set
 Frame_Offset = 0
@@ -54,7 +54,7 @@ Dark_Frame_Offset = 0
 Keep_Part_Files = 0
 
 # The number of OMP threads used. Num_Threads = 1 implies no parallelism.
-Num_Threads = 1
+Num_Threads = 2
 
 # The statistic to be stored for L2
 # 0 = None, 1 = Max, 2 = Mean
@@ -74,6 +74,9 @@ Compression_Scheme = 0
 # Compression_Level = 1 => Fastest Compression; Compression_Level = 9 => Highest Compression (Slowest)
 Compression_Level = 1
 
+# A boolean inidcator where 1 indicates the dark noise thresholds are stored as a frame, and 0 indicates they are not stored
+Keep_Dark_Data = 1
+
 # input file type (this parameter is used to identify file header type and size)
 # 0 = Binary, 1 = MRC, 2 = Others
 # the parameter is used to decide the position and size of the original file's header
@@ -83,7 +86,15 @@ Source_File_Type = 0
 # input file's header size in bytes 
 # used only if source_file_type is 0 or 2
 # if source_file_type = 1 (i.e MRC file) this input is ignored and header size is automatically set to 1024 bytes
-Source_Header_Length = 0
+Source_Header_Length = 1024
 
-# A boolean inidcator where 1 indicates the dark noise thresholds are stored as a frame, and 0 indicates they are not stored
-Keep_Dark_Data = 1
+# dark file type (this parameter is used to identify file header type and size)
+# 0 = Binary, 1 = MRC, 2 = Others
+# the parameter is used to decide the position and size of the original file's header
+# source_file_type = 1 (i.e MRC file), original file's header is pre-fixed to RC header, else original file's header is post-fixed to end of compressed RC data
+Dark_File_Type = 0
+
+# dark file's header size in bytes 
+# used only if source_file_type is 0 or 2
+# if source_file_type = 1 (i.e MRC file) this input is ignored and header size is automatically set to 1024 bytes
+Dark_Header_Length = 1024

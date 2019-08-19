@@ -165,7 +165,42 @@ void getSEQHeader(FILE* fp, SEQHeader** seq_header) {
 
 }
 
-int _get_frame (FILE* seqFile, uint64_t frame_no, uint16_t *buffer, SEQHeader *header) {
+void _fseekSequence (FILE* seqFile, uint64_t n_FramesToSkip, SEQHeader *header) {
+	
+	// skip header to reach start of first frame
+	fseek(seqFile, 8192, SEEK_SET);
+	
+	// fseek takes Long offset and so use _fseeki64 for windows and for linux use fseeko
+	uint64_t offset = n_FramesToSkip * header->TrueImageSize;
+	#ifdef _WIN32
+		_fseeki64(seqFile, offset, SEEK_CUR);
+	#else
+		fseeko(seqFile, offset, SEEK_CUR);
+	#endif
+
+	/*
+	if (offset < LONG_MAX) {
+		_fseeki64(seqFile, offset, SEEK_CUR);
+	}
+	else {
+		unsigned long remaining_offset;
+		do {
+			fseek(seqFile, LONG_MAX, SEEK_CUR);
+			remaining_offset = offset - LONG_MAX;
+		} while (remaining_offset > LONG_MAX);
+		fseek(seqFile, remaining_offset, SEEK_CUR);
+	}
+	*/
+	/*
+	for (uint32_t i = 0; i < n_FramesToSkip; i++) {
+		fseek(seqFile, header->TrueImageSize, SEEK_CUR);
+	}
+	*/
+}
+
+int _get_frame_1 (FILE* seqFile, uint64_t frame_no, uint16_t *buffer, SEQHeader *header) {
+
+	// offset is internally Long and will overflow
 	uint64_t offset = 8192 + (frame_no * header->TrueImageSize);
 	uint64_t n_PixelsInFrame = header->ImageInfo.ImageHeight * header->ImageInfo.ImageWidth;
 	fseek(seqFile, offset, 0);
@@ -178,14 +213,18 @@ int _get_frame (FILE* seqFile, uint64_t frame_no, uint16_t *buffer, SEQHeader *h
 	}
 }
 
-void _write_frame(FILE* seqFile, uint64_t frame_no, uint16_t *buffer, SEQHeader *header) {
+void _write_frame (FILE* seqFile, uint64_t frame_no, uint16_t *buffer, SEQHeader *header) {
+
+	// offset is internally Long and will overflow
 	uint64_t n_PixelsInFrame = header->ImageInfo.ImageHeight * header->ImageInfo.ImageWidth;
 	uint64_t offset = 8192 + (frame_no * header->TrueImageSize);
 	fseek(seqFile, offset, 0);
 	fwrite(buffer, 2, n_PixelsInFrame, seqFile);
 }
 
-uint64_t getSEQFrames(uint8_t process_id, FILE* seqFile, uint16_t *buffer, uint64_t frame_start, uint64_t n_Frames, SEQHeader *header) {
+uint64_t getSEQFrames_Old (uint8_t process_id, FILE* seqFile, uint16_t *buffer, uint64_t frame_start, uint64_t n_Frames, SEQHeader *header) {
+
+	// offset is internally Long and will overflow
 
 	// Important: this method assumes the data has 16-bit depth
 	uint64_t offset;
@@ -195,23 +234,75 @@ uint64_t getSEQFrames(uint8_t process_id, FILE* seqFile, uint16_t *buffer, uint6
 	// load data
 	uint64_t frame_count = 0;
 
-	fseek(seqFile, offset, 0);
+	//fseek(seqFile, offset, 0);
 	for (uint64_t i = frame_start; i < frame_start + n_Frames; i++) {
-		
+
 		offset = 8192 + (i * header->TrueImageSize);
+		printf("Offset = %" PRIu64 "\n", offset);
 		fseek(seqFile, offset, 0);
 
 		uint64_t read_count = fread(&buffer[frame_count*n_PixelsInFrame], 2, n_PixelsInFrame, seqFile);
+
+		/*================Testing==============*/
+		uint16_t max_val = 0;
+		for (uint64_t j = 0; j < n_PixelsInFrame; j++) {
+			if (buffer[frame_count*n_PixelsInFrame + j] > max_val) {
+				max_val = buffer[frame_count*n_PixelsInFrame + j];
+			}
+		}
+		printf("Max = %" PRIu16 "\n", max_val);
+		/*===============Testing==============*/
 
 		recode_print("RCT %d:Read Count: %d; Num. Frames to Process: %d\n", process_id, read_count, n_Frames);
 		if (read_count < n_PixelsInFrame) {
 			return frame_count;
 		}
-		
+
 		frame_count++;
 	}
 	return frame_count;
 }
+
+uint64_t getSEQFrames (uint8_t process_id, FILE* seqFile, uint16_t *buffer, uint64_t frame_start, uint64_t n_Frames, SEQHeader *header) {
+
+	// Important: this method assumes the data has 16-bit depth
+	// Assumes seqFile points to end of header (i.e. header has been already read)
+	long offset;
+	uint64_t n_PixelsInFrame = header->ImageInfo.ImageHeight * header->ImageInfo.ImageWidth;
+	uint64_t frame_count = 0;
+
+	for (uint64_t i = frame_start; i < frame_start + n_Frames; i++) {
+		
+		if (i == frame_start) {
+			_fseekSequence(seqFile, frame_start, header);
+		}
+		else {
+			offset = (long)(header->TrueImageSize - 2 * n_PixelsInFrame);
+			fseek(seqFile, offset, SEEK_CUR);
+		}
+
+		uint64_t read_count = fread(&buffer[frame_count*n_PixelsInFrame], 2, n_PixelsInFrame, seqFile);
+
+		/*================Testing==============
+		uint16_t max_val = 0;
+		for (uint64_t j = 0; j < n_PixelsInFrame; j++) {
+			if (buffer[frame_count*n_PixelsInFrame+j] > max_val) {
+				max_val = buffer[frame_count*n_PixelsInFrame + j];
+			}
+		}
+		printf("Max = %" PRIu16 "\n", max_val);
+		/*===============Testing==============*/
+
+		//recode_print("RCT %d:Read Count: %d; Num. Frames to Process: %d\n", process_id, read_count, n_Frames);
+		if (read_count < n_PixelsInFrame) {
+			return frame_count;
+		}
+
+		frame_count++;
+	}
+	return frame_count;
+}
+
 
 void setSEQFileData (FILE* seqFile, uint16_t *buffer, uint64_t n_Frames, SEQHeader *header) {
 	for (uint64_t i = 0; i < n_Frames; i++) {
@@ -272,7 +363,7 @@ void writeSEQHeader(FILE* seqFile, SEQHeader* header) {
 
 }
 
-void createSEQFiles (uint16_t *data, SEQHeader *seq_header, uint64_t n_Frames, const char* directory, int nFiles) {
+void createSEQFiles_1 (uint16_t *data, SEQHeader *seq_header, uint64_t n_Frames, const char* directory, int nFiles) {
 
 	int f;
 	for (f = 0; f < nFiles; f++) {

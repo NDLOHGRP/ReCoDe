@@ -262,3 +262,8 @@ class SEQReader(EMReaderBase):
     def close(self):
         self._is_open = False
         return
+
+
+if __name__ == "__main__":
+
+    reader = MRCReader('', 'mrcs')

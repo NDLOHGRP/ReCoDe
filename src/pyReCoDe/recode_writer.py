@@ -56,7 +56,7 @@ class ReCoDeWriter():
 
         self._header = ReCoDeHeader(self._init_params, self._input_params)
 
-        # Validate user given header values agree with MRC and SEQ Header values
+        # Validate that user given header values agree with MRC and SEQ Header values
         if self._input_params.source_file_type == 'mrc' or self._input_params.source_file_type == 'mrcs':
             
             self._source = MRCReader(self._init_params.image_filename, self._input_params.source_file_type)

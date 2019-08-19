@@ -6,6 +6,13 @@ from .recode_utils import _read_data_from_file, _read_bytearray_from_stream
 
 class ReCoDeHeader():
 
+    '''
+    ToDo:
+    Original File Header Position: should be always 0 default'
+    Dark Frame Offset and Number of Dark Frames Used for Calibration should be removed
+    
+    '''
+
     def __init__(self, init_params, input_params):
         self._uid = 158966344846346
         self._version_major = 0

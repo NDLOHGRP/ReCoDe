@@ -3,7 +3,8 @@
 
 void getDarkMax (uint16_t *darkBuffer, DataSize h, uint16_t *darkFrame, uint8_t nThreads) {
 	
-	uint64_t row, col, fno, pixel_index;
+	int64_t row, col;				// OpenMP 2 requires signed indices
+	uint64_t fno, pixel_index;
 	uint64_t linear_index;
 	uint64_t frame_size = h.nx*h.ny;
 	
@@ -61,7 +62,9 @@ void getDarkMax (uint16_t *darkBuffer, DataSize h, uint16_t *darkFrame, uint8_t 
 	}
 	*/
 	
-	#pragma omp parallel for num_threads(nThreads) collapse(2)
+	// collapse is an OpenMP 3 construct and is not supported by VS2015's OpenMP 2
+	// #pragma omp parallel for num_threads(nThreads) collapse(2)
+	// #pragma omp parallel for num_threads(nThreads)
 	for (row = 0; row < h.ny; row++) {
 		for (col = 0; col < h.nx; col++) {
 			pixel_index = row * h.nx + col;
@@ -235,7 +238,7 @@ float get_foreground_image (uint16_t *frameBuffer,
 		}
 	}
 	
-	//printf("No. of foreground pixels = %lu\n", *nFgPixels);
+	//recode_print("No. of foreground pixels = %lu\n", *n_fg_pixels);
 
 	clock_t p_end = clock();
 	float process_time = (p_end - p_start) * 1000.0 / CLOCKS_PER_SEC;

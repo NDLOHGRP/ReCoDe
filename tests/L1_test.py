@@ -11,6 +11,10 @@ import mrcfile
 import subprocess
 from sklearn.neighbors import NearestNeighbors
 
+sys.path.append('../src')
+from pyrecode.recoder import reduce_L1, reduce_L2, reduce_L3, reduce_L4
+from pyrecode.params import InputParams
+
 class BinaryDataReader:
     def __init__(self, shape, bytes_per_pixel, dtype):
         self.shape = shape
@@ -37,7 +41,7 @@ class BinaryDataReader:
         for i in range(num_frames):
             image_bytes = f.read(self.nBytesPerFrame)
             flattened_frame = np.frombuffer(image_bytes, dtype=self.dtype)
-            frames[i] = flattened_frame.reshape((self.shape[0], self.shape[1]))	
+            frames[i] = flattened_frame.reshape((self.shape[0], self.shape[1]))
         f.close()
         return frames
 
@@ -55,7 +59,13 @@ def run(cmd_str):
     else:
         return 0
 
-def match_frames(a,b):
+def _match_frames_L1 (a,b):
+    if np.array_equal (a,b):
+        return 0
+    else:
+        return 1
+
+def _match_frames_L4 (a,b):
     (y1,x1) = np.nonzero(a[10:-10,10:-10])
     (y2,x2) = np.nonzero(b[10:-10,10:-10])
     nbrs = NearestNeighbors(n_neighbors=1, algorithm='auto').fit(np.stack((y1,x1),1))
@@ -67,83 +77,67 @@ def match_frames(a,b):
     else:
         return -1
 
-def match_L4(L4_decoded, L4_counted_frames):
-    for a,b in zip(L4_decoded, L4_counted_frames):
-        status = match_frames(a,b)
+def _match (_decoded_frames, py_reduced_frames, reduction_level):
+    for a,b in zip(_decoded_frames, py_reduced_frames):
+        if reduction_level == 1:
+            status = _match_frames_L1 (a,b)
+        elif reduction_level == 4:
+            status = _match_frames_L4 (a,b)
         if status != 0:
             return -1
         else:
             continue
     return 0
 
-def test_L4(L4_counted_frames):
-    status = run('../win32/Debug/ReCoDe -rc -i ../data/Frames_0_3_12-13-59.436.bin -d ../data/Dark_Frame_12-23-00.232.bin -p ../config/recode_params_bd.txt -o ../scratch')
+def _test (py_reduced_frames, reduction_level):
+    # make params file for reduction_level
+    ip = InputParams()
+    ip.load('../config/recode_params_3.txt')
+    ip.reduction_level = reduction_level
+    ip.serialize('../config/recode_params_test.txt')
+
+    status = run('../win32/Release/ReCoDe -rc -i ../data/Frames_0_3_12-13-59.436.bin -d ../data/Dark_Frame_12-23-00.232.bin -p ../config/recode_params_test.txt -o ../scratch')
     if status == 0:
-        status = run('../win32/Debug/ReCoDe -de -i ../scratch/Frames_0_3_12-13-59.436.bin.rc4 -o ../scratch')
+        if reduction_level == 1:
+            status = run('../win32/Release/ReCoDe -de -i ../scratch/Frames_0_3_12-13-59.436.bin.rc1 -o ../scratch')
+        elif reduction_level == 4:
+            status = run('../win32/Release/ReCoDe -de -i ../scratch/Frames_0_3_12-13-59.436.bin.rc4 -o ../scratch')
         if status == 0:
             reader = BinaryDataReader([512,4096], 2, np.uint16)
-            L4_decoded = reader.extract_binary_frames('../scratch/Recoded_Frames_0_3_12-13-59.436.bin', 0, 4)
-            np.savetxt('../scratch/Recoded_Frames_0_3_12-13-59.436.txt', L4_decoded[0], fmt='%d')
-            np.savetxt('../scratch/Recoded_Frames_1_3_12-13-59.436.txt', L4_decoded[1], fmt='%d')
-            np.savetxt('../scratch/Recoded_Frames_2_3_12-13-59.436.txt', L4_decoded[2], fmt='%d')
-            np.savetxt('../scratch/Recoded_Frames_3_3_12-13-59.436.txt', L4_decoded[3], fmt='%d')
-            return match_L4 (L4_decoded, L4_counted_frames)
+            _decoded_frames = reader.extract_binary_frames('../scratch/Recoded_Frames_0_3_12-13-59.436.bin', 0, 4)
+            np.savetxt('../scratch/Recoded_Frames_0_3_12-13-59.436.txt', _decoded_frames[0], fmt='%d')
+            np.savetxt('../scratch/Recoded_Frames_1_3_12-13-59.436.txt', _decoded_frames[1], fmt='%d')
+            np.savetxt('../scratch/Recoded_Frames_2_3_12-13-59.436.txt', _decoded_frames[2], fmt='%d')
+            np.savetxt('../scratch/Recoded_Frames_3_3_12-13-59.436.txt', _decoded_frames[3], fmt='%d')
+            return _match (_decoded_frames, py_reduced_frames, reduction_level)
         else:
             return -1
     else:
         return -1
 
-def reduce_L4(data, dark, threshold, max_frames=10):
-    """
-    Extracts features of secondary electron puddles
-    Returns puddle size, frame index, centroid y and centroid x of detected secondary electron puddles.
-    Parameters
-    ----------
-    data : numpy array of shape [frames, rows, columns]
-    dark : numpy array of shape [rows, columns]
-    threshold : used to separate signal from noise
-        
-    Returns
-    -------
-    feature_dict : dictionary with frame indices as keys and list of N 1x4 arrays as value. The N 1x4 arrays are [centroid y, centroid x, puddle size, mean intensity] for the N secondary electron puddles
-    """
-    print(data.shape)
-    n_Frames = data.shape[0]
-    if max_frames < 0 or max_frames > n_Frames:
-        max_frames = n_Frames
-
-    data = data.astype(np.int32)
-    dark = dark.astype(np.int32)
-
-    feature_dict = {}
-    s = nd.generate_binary_structure(2,2)
-    counted_frames = np.zeros((n_Frames, data.shape[1], data.shape[2]))
-    for frame_index in range(max_frames):
-        dark_subtracted = data[frame_index] - dark
-        dark_subtracted_binary = dark_subtracted > threshold
-        labeled_foreground, num_features = nd.measurements.label(dark_subtracted_binary, structure=s)
-        print('num_features =', num_features)
-        regions = regionprops(labeled_foreground, dark_subtracted)
-        centroids = [reg['weighted_centroid'] for reg in regions]
-        centroids = (np.round(centroids)).astype(np.uint16)
-        C = np.swapaxes(centroids,0,1)
-        indices = np.ravel_multi_index(C, [512, 4096])
-        np.put(counted_frames[frame_index], indices, 1)
-        sm = coo_matrix( ( np.ones(centroids.shape[0]), (centroids[:,0],centroids[:,1]) ), shape=(512, 4096))
-        feature_dict[frame_index] = sm
-    return counted_frames, feature_dict
     
 if __name__== "__main__":
 
     reader = BinaryDataReader([512,4096], 2, np.uint16)
     data = reader.extract_binary_frames('../data/Frames_0_3_12-13-59.436.bin', 0, 4)
-    # data = reader.extract_binary_frame('../data/Frame_0_12-13-59.436.bin', 0)
-    dark = reader.extract_binary_frame('../data/Dark_Frame_12-23-00.232.bin', 0)
-    L4_counted_frames, _ = reduce_L4(data, dark[0], 0, max_frames=-1)
-    np.savetxt('../scratch/Counted_Frame_2.txt', L4_counted_frames[2], fmt='%d')
-    status = test_L4(L4_counted_frames)
-    if status == 0:
-        print("Passed")
-    else:
-        print("Failed")
+    dark = reader.extract_binary_frame('../data/Dark_Frame_12-23-00.232.bin', 0)    
+
+    for reduction_level in [1]:
+        
+        if reduction_level == 1:
+            py_reduced_frames, _ = reduce_L1 (data, dark[0], 0, max_frames=-1)
+        elif reduction_level == 2:
+            py_reduced_frames, _ = reduce_L2 (data, dark[0], 0, max_frames=-1)
+        elif reduction_level == 3:
+            py_reduced_frames, _ = reduce_L3 (data, dark[0], 0, max_frames=-1)
+        elif reduction_level == 4:
+            py_reduced_frames, _ = reduce_L4 (data, dark[0], 0, max_frames=-1)
+
+        np.savetxt('../scratch/Counted_Frame_3.txt', py_reduced_frames[3], fmt='%d')
+
+        status = _test (py_reduced_frames, reduction_level)
+        if status == 0:
+            print("Passed")
+        else:
+            print("Failed")
     

@@ -44,7 +44,7 @@ class InitParams():
         assert self._validate_input_params() == True, self._show_usage()
 
 
-    def _validate_input_params(self):
+    def _validate_init_params(self):
 
         if self._output_directory == '':
             print ('Output Directory cannot be empty')
@@ -153,30 +153,346 @@ class InitParams():
 
 class InputParams():
 
-    def __init__(self, params_filename):
-        self._params_filename = params_filename
+    '''
+    ToDo
+    1. dark_threshold_epsilon can be float; currently all inputs are assumed to be ints (see line 197)
+    2. source_bit_depth and bit_depth should be replaced with data_types to support floats
+    3. num_dark_frames and dark_frame_offset should be deprecated; ReCoDe should only accepts single frame calibration data
+    4. keep_dark_data should be renamed to append_calibration_data for clarity
+    '''
 
-    def load(self):
-        # make all non filename strings lowercase with .lower()
-        self._reduction_level = 0
-        self._rc_operation_mode = 0
-        self._dark_threshold_epsilon = 0
-        self._bit_depth = 0
-        self._source_bit_depth = 0
-        self._num_cols = 0
-        self._num_rows = 0
-        self._num_frames = 0
-        self._frame_offset = 0
-        self._num_dark_frames = 0
-        self._dark_frame_offset = 0
-        self._keep_part_files = 0
-        self._num_threads = 0
-        self._L2_statistics = 0
-        self._L4_centroiding = 0
-        self._compression_scheme = 0
-        self._compression_level = 0
-        self._keep_dark_data = 0
-        self._source_file_type = 0
-        self._source_header_length = 0
-        self._dark_file_type = 0
-        self._dark_header_length = 0
+    def __init__(self):
+        self._param_map = {}
+        self._param_map['reduction_level'] = -1
+        self._param_map['rc_operation_mode'] = -1
+        self._param_map['dark_threshold_epsilon'] = -1
+        self._param_map['bit_depth'] = -1
+        self._param_map['source_bit_depth'] = -1
+        self._param_map['num_cols'] = -1
+        self._param_map['num_rows'] = -1
+        self._param_map['num_frames'] = -1
+        self._param_map['frame_offset'] = -1
+        self._param_map['num_dark_frames'] = -1
+        self._param_map['dark_frame_offset'] = -1
+        self._param_map['keep_part_files'] = -1
+        self._param_map['num_threads'] = -1
+        self._param_map['l2_statistics'] = -1
+        self._param_map['l4_centroiding'] = -1
+        self._param_map['compression_scheme'] = -1
+        self._param_map['compression_level'] = -1
+        self._param_map['source_file_type'] = -1
+        self._param_map['source_header_length'] = -1
+        self._param_map['keep_dark_data'] = -1
+        self._param_map['dark_file_type'] = -1
+        self._param_map['dark_header_length'] = -1
+
+    def load(self, params_filename):
+        assert params_filename != '', 'Params filename missing'
+        with open(params_filename) as fp:
+            for line in fp:
+                if line == '' or line == '\n' or line.startswith('#'):
+                    continue
+                else:
+                    parts = line.split('=')
+                    key = parts[0].strip().lower()
+                    assert key in self._param_map, 'Unknown parameter: ' + key
+                    self._param_map[key] = int(parts[1].strip().lower())
+
+        """
+        for key in self._param_map:
+            if key == 'reduction_level':
+                self._reduction_level = self._param_map[key]
+            elif key == 'rc_operation_mode':
+                self._rc_operation_mode = self._param_map[key]
+            elif key == 'dark_threshold_epsilon':
+                self._dark_threshold_epsilon = self._param_map[key]
+            elif key == 'bit_depth':
+                self._bit_depth = self._param_map[key]
+            elif key == 'source_bit_depth':
+                self._source_bit_depth = self._param_map[key]
+            elif key == 'num_cols':
+                self._num_cols = self._param_map[key]
+            elif key == 'num_rows':
+                self._num_rows = self._param_map[key]
+            elif key == 'num_frames':
+                self._num_frames = self._param_map[key]
+            elif key == 'frame_offset':
+                self._frame_offset = self._param_map[key]
+            elif key == 'num_dark_frames':
+                self._num_dark_frames = self._param_map[key]
+            elif key == 'dark_frame_offset':
+                self._dark_frame_offset = self._param_map[key]
+            elif key == 'keep_part_files':
+                self._keep_part_files = self._param_map[key]
+            elif key == 'num_threads':
+                self._num_threads = self._param_map[key]
+            elif key == 'l2_statistics':
+                self._L2_statistics = self._param_map[key]
+            elif key == 'l4_centroiding':
+                self._L4_centroiding = self._param_map[key]
+            elif key == 'compression_scheme':
+                self._compression_scheme = self._param_map[key]
+            elif key == 'compression_level':
+                self._compression_level = self._param_map[key]
+            elif key == 'source_file_type':
+                self._source_file_type = self._param_map[key]
+            elif key == 'source_header_length':
+                self._source_header_length = self._param_map[key]
+            elif key == 'keep_dark_data':
+                self._keep_dark_data = self._param_map[key]
+            elif key == 'dark_file_type':
+                self._dark_file_type = self._param_map[key]
+            elif key == 'dark_header_length':
+                self._dark_header_length = self._param_map[key]
+        """
+
+    def _validate_input_params(self):
+
+        if self._reduction_level not in ['1','2','3','4']:
+            print ('Reduction level must be 1, 2, 3 or 4')
+            return False
+
+        if self._rc_operation_mode not in ['0','1','2'] :
+            print ('RC Operation mode can be 0, 1 or 2')
+            return False
+
+        if self._dark_threshold_epsilon == '':
+            print ('Dark Threshold Epsilon cannot be empty')
+            return False
+
+        if self._bit_depth == '':
+            self._bit_depth = self._source_bit_depth
+            #print ('Bit depth cannot be empty')
+            #return False
+
+        if self._source_bit_depth == '' and self._source_file_type in ['0','3']:
+            print ('Source bit depth cannot be empty when source filetype is binary/other')
+            return False
+
+        if self._num_cols == '' and self._source_file_type in ['0','3']:
+            print ('Number of columns cannot be empty when source filetype is binary/other')
+            return False
+
+        if self._num_rows == '' and self._source_file_type in ['0','3']:
+            print ('Number of rows cannot be empty when source filetype is binary/other')
+            return False
+
+        if self._num_frames == '' and self._source_file_type in ['0','3']:
+            print ('Number of frames cannot be empty when source filetype is binary/other')
+            return False
+
+        if not isinstance(self._frame_offset, int):
+            print ('Frame offset should be an integer')
+            return False
+
+        #if self._num_dark_frames == '':
+            #print ('Number of dark frames cannot be empty')
+            #return False
+
+        #if self._dark_frame_offset == '':
+            #print ('Dark frame offset cannot be empty')
+            #return False
+
+        if self._keep_part_files not in ['0','1']:
+            print ('Keep part files must be 0 or 1')
+            return False
+
+        if not isinstance(self._num_threads, int):
+            print ('Number of threads should be an integer')
+            return False
+
+        if self._L2_statistics not in ['0','1','2']:
+            print ('L2 statistics must be 0, 1 or 2')
+            return False
+
+        if self._L4_centroiding not in ['0','1','2','3']:
+            print ('L4 centroiding must be 0, 1, 2 or 3')
+            return False
+
+        if self._compression_scheme not in ['0','1','2','3','4']:
+            print ('Compression scheme must be 0, 1, 2, 3 or 4')
+            return False
+
+        if int(self._compression_level) < 0 or int(self._compression_level) > 9:
+            print ('Compression level can be from 0 - 9')
+            return False
+
+        if self._keep_dark_data not in ['0','1']:
+            print ('Keep dark data cannot be either 0 or 1')
+            return False
+
+        if self._source_file_type not in ['0','1','2','3']:
+            print ('Source file type must be 0, 1, 2 or 3')
+            return False
+
+        if (self._source_header_length == '' or not isinstance(self._source_header_length, int)) and self._source_file_type in ['0','3']:
+            print ('Source Header Length cannot be empty or non-integer when source filetype is binary/other')
+            return False
+
+        if self._dark_file_type not in ['0','1','2','3']:
+            print ('Dark filetype must be 0, 1, 2 or 3')
+            return False
+
+        if (self._dark_header_length == '' or not isinstance(self._dark_header_length, int)) and self._dark_file_type in ['0','3']:
+            print ('Dark Header Length cannot be empty or non-integer when dark filetype is binary/other')
+            return False
+
+        if self._frame_offset < 0:
+            self._frame_offset = 0
+
+        if self._num_threads < 1:
+            self._num_threads = 1
+
+        return True
+
+    def serialize (self, filename):
+        with open(filename, 'w') as f:
+            for key in self._param_map:
+                f.write(key + ' = ' + str(self._param_map[key]) + '\n')
+
+    @property
+    def reduction_level(self):
+        """Returns the reduction level
+        """
+        return self._param_map['reduction_level']
+
+    @reduction_level.setter
+    def reduction_level(self, value):
+        self._param_map['reduction_level'] = value
+
+    @property
+    def rc_operation_mode(self):
+        """Returns the rc operation mode
+        """
+        return self._param_map['rc_operation_mode']
+
+    @property
+    def dark_threshold_epsilon(self):
+        """Returns the dark threshold epsilon
+        """
+        return self._param_map['dark_threshold_epsilon']
+
+    @property
+    def bit_depth(self):
+        """Returns the bit depth 
+        """
+        return self._param_map['bit_depth']
+
+    @property
+    def source_bit_depth(self):
+        """Returns the source bit depth 
+        """
+        return self._param_map['source_bit_depth']
+
+    @property
+    def num_cols(self):
+        """Returns the number of columns
+        """
+        return self._param_map['num_cols']
+
+    @property
+    def num_rows(self):
+        """Returns the number of rows
+        """
+        return self._param_map['num_rows']
+
+    @property
+    def num_frames(self):
+        """Returns the number of frames
+        """
+        return self._param_map['num_frames']
+
+    @property
+    def frame_offset(self):
+        """Returns the frame offset
+        """
+        return self._param_map['frame_offset']
+
+    @property
+    def num_dark_frames(self):
+        """Returns number of dark frames
+        """
+        return self._param_map['num_dark_frames']
+
+    @property
+    def dark_frame_offset(self):
+        """Returns dark frame offset
+        """
+        return self._param_map['dark_frame_offset']
+
+    @property
+    def keep_part_files(self):
+        """Returns keep part files
+        """
+        return self._param_map['keep_part_files']
+
+    @property
+    def num_threads(self):
+        """Returns number of threads
+        """
+        return self._param_map['num_threads']
+
+    @property
+    def L2_statistics(self):
+        """Returns L2 statistics
+        """
+        return self._param_map['L2_statistics']
+
+    @property
+    def L4_centroiding(self):
+        """Returns L4 centroiding
+        """
+        return self._param_map['L4_centroiding']
+
+    @property
+    def compression_scheme(self):
+        """Returns compression scheme
+        """
+        return self._param_map['compression_scheme']
+
+    @property
+    def compression_level(self):
+        """Returns compression level
+        """
+        return self._param_map['compression_level']
+
+    @property
+    def keep_dark_data(self):
+        """Returns nkeep dark data
+        """
+        return self._param_map['keep_dark_data']
+
+    @property
+    def source_file_type(self):
+        """Returns source file type
+        """
+        return self._param_map['source_file_type']
+
+    @property
+    def source_header_length(self):
+        """Returns source header length
+        """
+        return self._param_map['source_header_length']
+
+    @property
+    def dark_file_type(self):
+        """Returns dark file type
+        """
+        return self._param_map['dark_file_type']
+
+    @property
+    def dark_header_length(self):
+        """Returns dark header length
+        """
+        return self._param_map['dark_header_length']
+
+
+
+if __name__== "__main__":
+
+    ip = InputParams()
+    ip.load('../../config/recode_params_3.txt')
+    print(ip._param_map)
+    # print(ip._validate_input_params())
+    ip.reduction_level = 4
+    ip.serialize('../../config/recode_params_L1.txt')

@@ -1,11 +1,12 @@
 
 #pragma warning(disable:4996)
 // define the ID values to indentify the option
-enum { OPT_HELP, OPT_RC, OPT_DE, ARG_VERB, ARG_IMG, ARG_DRK, ARG_PRM, ARG_DIR, ARG_LOG, ARG_NAM, ARG_VAF };
+enum { OPT_HELP, OPT_RC, OPT_DE, OPT_MR, ARG_VERB, ARG_IMG, ARG_DRK, ARG_PRM, ARG_DIR, ARG_LOG, ARG_NAM, ARG_VAF };
 
 CSimpleOpt::SOption g_rgOptions[] = {
 	{ OPT_RC,	 _T("-rc"),    SO_NONE },	  // "-rc: reduce-compress"
 	{ OPT_DE,	 _T("-de"),    SO_NONE },	  // "-de: decompress-expand"
+	{ OPT_MR,	 _T("-mr"),    SO_NONE },	  // "-mr: merge part files"
 	{ ARG_VERB,  _T("-v"),     SO_REQ_SEP },  // "-v verbosity"
 	{ ARG_IMG,   _T("-i"),     SO_REQ_SEP },  // "-i imagefile; -i recode_file"
 	{ ARG_DRK,   _T("-d"),     SO_REQ_SEP },  // "-d darkfile"
@@ -244,7 +245,7 @@ int parse_init_params(int argc, TCHAR * argv[], InitParams **init_params) {
 					(*init_params)->mode = 0;
 				}
 				else {
-					printf("-rc and -de options cannot be used simultaneously.\n");
+					printf("-rc, -de or -mr options cannot be used simultaneously.\n");
 					return 0;
 				}
 				break;
@@ -253,7 +254,16 @@ int parse_init_params(int argc, TCHAR * argv[], InitParams **init_params) {
 					(*init_params)->mode = 1;
 				}
 				else {
-					printf("-rc and -de options cannot be used simultaneously.\n");
+					printf("-rc, -de or -mr options cannot be used simultaneously.\n");
+					return 0;
+				}
+				break;
+			case OPT_MR:
+				if ((*init_params)->mode == -1) {
+					(*init_params)->mode = 2;
+				}
+				else {
+					printf("-rc, -de or -mr options cannot be used simultaneously.\n");
 					return 0;
 				}
 				break;
@@ -288,7 +298,7 @@ int parse_init_params(int argc, TCHAR * argv[], InitParams **init_params) {
 
 	int params_check_cleared = 1;
 	if ((*init_params)->mode == -1) {
-		printf("Missing Parameter: Specify -rc or -de.\n");
+		printf("Missing Parameter: Specify -rc, -de or -mr.\n");
 		params_check_cleared = 0;
 	}
 	if ((*init_params)->output_directory == NULL) {
@@ -300,7 +310,7 @@ int parse_init_params(int argc, TCHAR * argv[], InitParams **init_params) {
 		params_check_cleared = 0;
 	}
 	if ((*init_params)->mode == 0 && (*init_params)->dark_filename == NULL) {
-		printf("Missing Parameter Dark File: Use -o option to specify.\n");
+		printf("Missing Parameter Dark File: Use -d option to specify.\n");
 		params_check_cleared = 0;
 	}
 	if ((*init_params)->mode == 0 && (*init_params)->params_filename == NULL) {
