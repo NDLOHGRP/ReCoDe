@@ -154,7 +154,7 @@ float reduceFrame_L1 (  uint8_t	 process_id,
 															binaryImage, pixvals, &n_fg_pixels, &data_min, &data_max);
 	*n_bytes_in_packed_pixvals 	= ceil((n_fg_pixels * (bit_depth))/8);
 	float packing_time 			= scale_and_pack_pixvals (process_id, pixvals, n_fg_pixels, data_min, data_max, bit_depth, packedPixvals);
-	printf("packing_time=%f\n", packing_time);
+	//printf("packing_time=%f\n", packing_time);
 	float reduction_time 		= thresh_time + packing_time;
 	return reduction_time;
 }
@@ -452,9 +452,7 @@ char* reduceCompress_L1 (uint8_t	 process_id,
 
 char* merge_RC1_Parts (	const char   *folderpath, 
 						char         **part_filenames, 
-						RCHeader 	 *rcHeader, 
-						InputParams  *input_params,
-						const char   *compressed_filename
+						InputParams  *input_params
 ) {
 	
 	const int num_partfiles = input_params->num_threads;
@@ -465,25 +463,25 @@ char* merge_RC1_Parts (	const char   *folderpath,
 	uint32_t total_frames = 0;
 	uint32_t *process_id_num_frames_map = (uint32_t*)malloc((num_partfiles)*sizeof(long));
 
+	RCHeader *header = (RCHeader *)malloc(sizeof(RCHeader));
 	for (i = 0; i<num_partfiles; i++) {
-		
 		FILE *fp = fopen(concat(folderpath, part_filenames[i]), "rb");
 		recode_print("%s\n", concat(folderpath, part_filenames[i]));
-		
-		RCHeader *header = (RCHeader *)malloc(sizeof(RCHeader));
 		parse_recode_header(fp, &header);
-
 		process_id_num_frames_map[i] = header->nz;
 		total_frames += header->nz;
-		
 		fclose(fp);
-		
+		print_recode_header(header);
 		recode_print("%lu\n", total_frames);
 	}
 	
 	//printf("1\n");
 	
-	uint32_t *frame_process_id_map 	= (uint32_t*)malloc((total_frames)*sizeof(uint32_t));
+	int32_t *frame_process_id_map 	= (int32_t*)malloc((total_frames)*sizeof(int32_t));
+	uint32_t frame_id = 0;
+	for (frame_id = 0; frame_id < total_frames; frame_id++) {
+		frame_process_id_map[frame_id] = -1;
+	}
 	uint32_t *frame_data_sizes_map 	= (uint32_t*)malloc((total_frames)*sizeof(uint32_t)*3);
 
 	FILE **partFiles = (FILE**)malloc((num_partfiles)*sizeof(FILE*));
@@ -516,16 +514,18 @@ char* merge_RC1_Parts (	const char   *folderpath,
 			frame_data_sizes_map[frame_id*3+1] 	= nCompressedSize_Pixvals;
 			frame_data_sizes_map[frame_id*3+2] 	= bytesRequiredForPacking;
 
+			/*
 			printf("Frame ID: %d\n", frame_id);
 			printf("Compressed Size 1: %d\n", nCompressedSize_BinaryImage);
 			printf("Compressed Size 2: %d\n", nCompressedSize_Pixvals);
 			printf("Packed Bytes: %d\n", bytesRequiredForPacking);
+			*/
 		}
 		
 		fclose(partFiles[i]);
 	}
 	
-	compressed_filename = concat(compressed_filename, ".rc1");
+	const char *compressed_filename = concat(folderpath, concat((const char*)&(header->source_file_name), ".rc1"));
 	FILE *target_fp = fopen(compressed_filename, "wb");
 	for (i = 0; i<num_partfiles; i++) {
 		partFiles[i] = fopen(concat(folderpath, part_filenames[i]), "rb");
@@ -533,10 +533,11 @@ char* merge_RC1_Parts (	const char   *folderpath,
 		fseek(partFiles[i], RC_HEADER_LENGTH, SEEK_SET);
 	}
 	
-	// write RC header to compressed_filename
-	serialize_recode_header (target_fp, rcHeader);
+	// write header to compressed_filename
+	// serialize the number of frames in the header
+	header->nz = total_frames;
+	serialize_recode_header(target_fp, header);
 	
-	uint32_t frame_id = 0;
 	for (frame_id = 0; frame_id < total_frames; frame_id++) {
 		// write compressed frame sizes to compressed_filename
 		fwrite (&frame_data_sizes_map[frame_id*3], 	 sizeof(uint32_t), 1, target_fp);
@@ -552,8 +553,12 @@ char* merge_RC1_Parts (	const char   *folderpath,
 	uint8_t *compressedPixvals = (uint8_t*)calloc(n_bytes_in_image, sizeof(uint8_t));
 	for (frame_id = 0; frame_id < total_frames; frame_id++) {
 		
-		// read a frame (frame_id) from partfile_num
+		// get the part file that contains the frame
 		partfile_num = frame_process_id_map[frame_id];
+		if (partfile_num == -1) {
+			printf("Missing Frame: %d\n", frame_id);
+			continue;
+		}
 		
 		// skip frame_id, nCompressedSize_BinaryImage, nCompressedSize_Pixvals, bytesRequiredForPacking
 		fseek (partFiles[partfile_num], sizeof(uint32_t) * 4, SEEK_CUR);
@@ -573,6 +578,7 @@ char* merge_RC1_Parts (	const char   *folderpath,
 	}
 	fclose(target_fp);
 
+	free(header);
 	free(compressedBinaryImage);
 	free(compressedPixvals);
 	free(process_id_num_frames_map);

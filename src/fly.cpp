@@ -98,7 +98,7 @@ void runRCT_L1(
 
 	uint8_t copy_compressed_frame_to_return_buffer = 1;
 	uint8_t rc_operation_mode = params->reduction_level;
-	char* destination_directory = init_params->output_directory;
+	char* destination_directory = format_directory_path(init_params->output_directory);
 	char* name = init_params->run_name;
 	int validation_frame_gap = init_params->validation_frame_gap;
 	uint8_t num_threads_in_pool = params->num_threads;
@@ -196,6 +196,7 @@ void runRCT_L1(
 				fwrite(pBuffer, sizeof(char), RCT_Buffer_Fill_Position, partFile);
 				//fwrite(&num_frames_in_part, sizeof(uint32_t), 1, partFile);		// serialize the number of frames at the end
 				nWrites++;
+				//recode_print("RCT %d: Why? Why? Why? Why?\n", process_id);
 
 				// serialize the number of frames in the header
 				fseek(partFile, 17, SEEK_SET);
@@ -203,7 +204,7 @@ void runRCT_L1(
 				fseek(partFile, 277, SEEK_SET);
 				fwrite(&process_id, sizeof(uint8_t), 1, partFile);
 
-				fclose(partFile);
+				int partfile_status = fclose(partFile);
 				if (validation_frame_gap > 0) {
 					fclose(validationFile);
 				}
@@ -480,7 +481,7 @@ void mergePartFiles(InitParams *init_params, InputParams *params, RCHeader *head
 	for (part_num = 0; part_num < params->num_threads; part_num++) {
 		part_filenames[part_num] = makePartFilename(part_num, init_params->run_name, params->reduction_level);
 	}
-	merge_RC1_Parts(init_params->output_directory, part_filenames, header, params, compressed_filename);
+	merge_RC1_Parts(init_params->output_directory, part_filenames, params);
 }
 
 int start_zmq_server(InitParams *init_params, InputParams *params, RCHeader *header) {
@@ -525,13 +526,14 @@ int start_zmq_server(InitParams *init_params, InputParams *params, RCHeader *hea
 
 void _simulate_zmq_run(InitParams *init_params, InputParams *params, RCHeader *header) {
 
-	int iters = 3;
+	int iters = 1;
 	for (int i = 0; i < iters; i++) {
 		printf("ReCoDe Server: Received Request %d, processing: %d\n", i, i);
 		reset_run_stats();
 		//IMAGE_FILENAME = "R:\\003.seq";
 		//IMAGE_FILENAME = "D:\\cbis\\GitHub\\ReCoDe\\scratch\\temp\\003.seq";
-		IMAGE_FILENAME = "D:\\cbis\\images\\SequenceBlocks\\17-21-33.138_Dark_Ref_3.seq";
+		//IMAGE_FILENAME = "D:\\cbis\\images\\SequenceBlocks\\17-21-33.138_Dark_Ref_3.seq";
+		IMAGE_FILENAME = init_params->image_filename;
 		set_RCT_States(RCT_STATE_INDICATORS, params->num_threads, 1);
 		Sleep(3000);
 		while (get_RCT_States(RCT_STATE_INDICATORS, params->num_threads, 1) != 0) {
@@ -543,7 +545,7 @@ void _simulate_zmq_run(InitParams *init_params, InputParams *params, RCHeader *h
 	
 	RUN_STATE_INDICATOR = 0;
 	while (get_RCT_States(RCT_STATE_INDICATORS, params->num_threads, 1) != 0) {
-		Sleep(100);          //  Wait for RCT Threads to finish
+		Sleep(500);          //  Wait for RCT Threads to finish
 	}
 	printf("Shutdown Complete\n");
 	exit(0);
@@ -552,48 +554,6 @@ void _simulate_zmq_run(InitParams *init_params, InputParams *params, RCHeader *h
 
 #ifdef _WIN32
 int _tmain(int argc, TCHAR * argv[]) {
-
-	/*====================Testing========================*/
-	//const char* filename = "D:/cbis/images/20161207/14-37-50.811.seq";
-	//const char* filename = "Z:/26-April-2019/Live_Acquisition_1/RamDisk_LeftOver/15-10-17.540.seq";
-	const char* filename = "D:/cbis/images/SequenceBlocks/17-21-33.138_Dark_Ref_3.seq";
-	DataSize d = { 4096, 512, 2000, 12 };
-	uint64_t sz_darkBuffer = d.nx * d.ny * d.nz * sizeof(uint16_t);
-	uint16_t *darkBuffer = (uint16_t *)malloc(sz_darkBuffer);
-	
-	SEQHeader *seq_header = (SEQHeader *)malloc(sizeof(SEQHeader));
-	FILE* fp = fopen(filename, "rb");
-	if (!fp) {
-		printf("Failed to open file: '%s' for reading.", filename);
-		exit(1);
-	}
-	getSEQHeader(fp, &seq_header);
-	uint64_t frame_offset = 0;
-	uint64_t available_frames = getSEQFrames(0, fp, darkBuffer, frame_offset, d.nz, seq_header);
-	printf("Available Frames = %" PRIu64 "\n", available_frames);
-	uint64_t i, j, frame_start_index, linear_index;
-	uint16_t max_val = 0;
-	int x[] = { 99, 1111, 2222, 3333, 4000 };
-	int y[] = { 110, 220, 330, 440, 500 };
-	for (i = 0; i <  available_frames; i++) {
-		frame_start_index = i*d.nx*d.ny;
-		printf("Frame %" PRIu64 ": ", i + frame_offset);
-		for (j = 0; j < 5; j++) {
-			linear_index = y[j] * d.nx + x[j];
-			printf("%d,%d=%" PRIu16 ", ", y[j], x[j], darkBuffer[frame_start_index + linear_index]);
-		}
-		printf("\n");
-	}
-	printf("Max = %" PRIu16 "\n", max_val);
-	fclose(fp);
-
-	exit(0);
-
-	/*
-	createSEQFiles(darkBuffer, seq_header, 50, "D:/cbis/GitHub/ReCoDe/scratch/temp/", 10);
-	return 0;
-	*/
-	/*====================Testing========================*/
 
 	omp_set_nested(1);
 
@@ -676,8 +636,12 @@ int _tmain(int argc, TCHAR * argv[]) {
 			start_recode_server (init_params, params, header, darkFrame);
 		}
 		else {
-			//start_zmq_server (init_params, params, header);
-			_simulate_zmq_run(init_params, params, header);
+			if (init_params->mode == 0) {
+				start_zmq_server (init_params, params, header);
+			}
+			else if (init_params->mode == 3) {
+				_simulate_zmq_run(init_params, params, header);
+			}
 		}
 	}
 

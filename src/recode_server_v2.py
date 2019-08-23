@@ -5,8 +5,19 @@ import time
 import zmq
 import queue
 
+#=========Params==========
 # path = "R:\\"
-path = "R:\DE-16"
+path = "R:\DE16"
+max_count = 12
+chunk_time_in_sec = 5
+#=========Params==========
+
+
+for f in os.listdir(path):
+    os.remove(f)
+
+with open(os.path.join('..','temp','interrupt_state'), 'w') as f:
+    f.write('0\n')
 
 context = zmq.Context()
 print ("Connecting to server...")
@@ -19,9 +30,9 @@ queued_files = {}
 isFirst = True
 
 count = 0
-max_count = 3
 
-while(count < max_count-1):
+has_interrupt = False
+while(not has_interrupt and count < max_count-1):
 
     f_list = [f for f in os.listdir(path) if isfile(join(path, f)) and f.endswith(".seq")]
     
@@ -60,6 +71,13 @@ while(count < max_count-1):
         os.remove(join(path, "Next_Stream.seq"))
         elapsed_time = time.time() - start_time
         print("Monitor Thread: Cleared in " + str(elapsed_time) + " seconds.\n")
+        
+        # Check for interrupts
+        with open(os.path.join('..','temp','interrupt_state'), 'r') as f:
+            content = f.readline()
+            content = content.strip()
+            has_interrupt = int(content) == 1
+            print("Interrupted")
     
 # print(f_list)
 # print('{0:d} files in Queue.'.format(q.qsize()))
@@ -68,7 +86,7 @@ while(count < max_count-1):
 fname = q.get()
 
 # Wait for the last file to be written (necessary when processing is faster than acquisition)
-time.sleep(10)
+time.sleep(chunk_time_in_sec+1)
     
 # Rename
 new_fname = join(path, "Next_Stream.seq")

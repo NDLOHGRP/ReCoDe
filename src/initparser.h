@@ -1,12 +1,13 @@
 
 #pragma warning(disable:4996)
 // define the ID values to indentify the option
-enum { OPT_HELP, OPT_RC, OPT_DE, OPT_MR, ARG_VERB, ARG_IMG, ARG_DRK, ARG_PRM, ARG_DIR, ARG_LOG, ARG_NAM, ARG_VAF };
+enum { OPT_HELP, OPT_RC, OPT_DE, OPT_MERGE, OPT_TEST, ARG_VERB, ARG_IMG, ARG_DRK, ARG_PRM, ARG_DIR, ARG_LOG, ARG_NAM, ARG_VAF };
 
 CSimpleOpt::SOption g_rgOptions[] = {
 	{ OPT_RC,	 _T("-rc"),    SO_NONE },	  // "-rc: reduce-compress"
 	{ OPT_DE,	 _T("-de"),    SO_NONE },	  // "-de: decompress-expand"
-	{ OPT_MR,	 _T("-mr"),    SO_NONE },	  // "-mr: merge part files"
+	{ OPT_MERGE, _T("-merge"), SO_NONE },	  // "-merge: merge part files"
+	{ OPT_TEST,	 _T("-test"),  SO_NONE },	  // "-test: run test script"
 	{ ARG_VERB,  _T("-v"),     SO_REQ_SEP },  // "-v verbosity"
 	{ ARG_IMG,   _T("-i"),     SO_REQ_SEP },  // "-i imagefile; -i recode_file"
 	{ ARG_DRK,   _T("-d"),     SO_REQ_SEP },  // "-d darkfile"
@@ -132,6 +133,7 @@ int parse_recode_server_init_params (int argc, TCHAR * argv[], InitParams **init
 	// as well as our array of valid options.
 	CSimpleOpt args(argc, argv, g_rgOptions);
 
+	(*init_params)->mode = 0;
 	(*init_params)->verbosity = 0;
 	(*init_params)->log_filename = "recode.log";
 	(*init_params)->run_name = "Run";
@@ -149,6 +151,9 @@ int parse_recode_server_init_params (int argc, TCHAR * argv[], InitParams **init
 			case OPT_HELP:
 				ShowReCoDeServerUsage();
 				return 0;
+			case OPT_TEST:
+				(*init_params)->mode = 3;
+				break;
 			case ARG_VERB:
 				(*init_params)->verbosity = wchar_to_int(args.OptionArg());
 				break;
@@ -187,11 +192,11 @@ int parse_recode_server_init_params (int argc, TCHAR * argv[], InitParams **init
 		printf("Missing Parameter Image File: Use -i option to specify.\n");
 		params_check_cleared = 0;
 	}
-	if ((*init_params)->mode == 0 && (*init_params)->dark_filename == NULL) {
+	if ((*init_params)->dark_filename == NULL) {
 		printf("Missing Parameter Dark File: Use -o option to specify.\n");
 		params_check_cleared = 0;
 	}
-	if ((*init_params)->mode == 0 && (*init_params)->params_filename == NULL) {
+	if ((*init_params)->params_filename == NULL) {
 		printf("Missing Parameter Params File: Use -p option to specify.\n");
 		params_check_cleared = 0;
 	}
@@ -245,7 +250,7 @@ int parse_init_params(int argc, TCHAR * argv[], InitParams **init_params) {
 					(*init_params)->mode = 0;
 				}
 				else {
-					printf("-rc, -de or -mr options cannot be used simultaneously.\n");
+					printf("-rc, -de, -merge or -test options cannot be used simultaneously.\n");
 					return 0;
 				}
 				break;
@@ -254,16 +259,25 @@ int parse_init_params(int argc, TCHAR * argv[], InitParams **init_params) {
 					(*init_params)->mode = 1;
 				}
 				else {
-					printf("-rc, -de or -mr options cannot be used simultaneously.\n");
+					printf("-rc, -de, -merge or -test options cannot be used simultaneously.\n");
 					return 0;
 				}
 				break;
-			case OPT_MR:
+			case OPT_MERGE:
 				if ((*init_params)->mode == -1) {
 					(*init_params)->mode = 2;
 				}
 				else {
-					printf("-rc, -de or -mr options cannot be used simultaneously.\n");
+					printf("-rc, -de, -merge or -test options cannot be used simultaneously.\n");
+					return 0;
+				}
+				break;
+			case OPT_TEST:
+				if ((*init_params)->mode == -1) {
+					(*init_params)->mode = 3;
+				}
+				else {
+					printf("-rc, -de, -merge or -test options cannot be used simultaneously.\n");
 					return 0;
 				}
 				break;
@@ -298,14 +312,17 @@ int parse_init_params(int argc, TCHAR * argv[], InitParams **init_params) {
 
 	int params_check_cleared = 1;
 	if ((*init_params)->mode == -1) {
-		printf("Missing Parameter: Specify -rc, -de or -mr.\n");
+		printf("Missing Parameter. Specify one of the following operating modes: -rc, -de, -merge or -test.\n");
 		params_check_cleared = 0;
 	}
 	if ((*init_params)->output_directory == NULL) {
 		printf("Missing Parameter Output Directory: Use -o option to specify.\n");
+		if ((*init_params)->mode == 2) {
+			printf("When mode is -merge output directory is also the input directory where the part files are present.\n");
+		}
 		params_check_cleared = 0;
 	}
-	if ((*init_params)->image_filename == NULL) {
+	if (((*init_params)->mode == 0 || (*init_params)->mode == 1 || (*init_params)->mode == 2) && (*init_params)->image_filename == NULL) {
 		printf("Missing Parameter Image File: Use -i option to specify.\n");
 		params_check_cleared = 0;
 	}
@@ -315,6 +332,15 @@ int parse_init_params(int argc, TCHAR * argv[], InitParams **init_params) {
 	}
 	if ((*init_params)->mode == 0 && (*init_params)->params_filename == NULL) {
 		printf("Missing Parameter Params File: Use -p option to specify.\n");
+		params_check_cleared = 0;
+	}
+	if (((*init_params)->mode == 2 || (*init_params)->mode == 3) && (*init_params)->run_name == NULL) {
+		if ((*init_params)->mode == 2) {
+			printf("Missing run name. When mode is -merge run name indicates the prefix to part file names and is required. Use -n option to specify.\n");
+		}
+		if ((*init_params)->mode == 3) {
+			printf("Missing run name. When mode is -test run name indicates the test to run and is required. Use -n option to specify.\n");
+		}
 		params_check_cleared = 0;
 	}
 	if ((*init_params)->verbosity > 1) {

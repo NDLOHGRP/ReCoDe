@@ -336,7 +336,6 @@ char* reduceCompress_L4 (uint8_t	 process_id,
 
 char* merge_RC4_Parts(	const char*	 folderpath,
 						char**       part_filenames,
-						RCHeader 	 *rcHeader,
 						InputParams  *input_params,
 						const char   *compressed_filename
 ) {
@@ -349,12 +348,12 @@ char* merge_RC4_Parts(	const char*	 folderpath,
 	uint32_t total_frames = 0;
 	uint32_t *process_id_num_frames_map = (uint32_t*)malloc((num_partfiles) * sizeof(long));
 
+	RCHeader *header = (RCHeader *)malloc(sizeof(RCHeader));
 	for (i = 0; i<num_partfiles; i++) {
 
 		FILE *fp = fopen(concat(folderpath, part_filenames[i]), "rb");
 		recode_print("%s\n", concat(folderpath, part_filenames[i]));
 
-		RCHeader *header = (RCHeader *)malloc(sizeof(RCHeader));
 		parse_recode_header(fp, &header);
 
 		process_id_num_frames_map[i] = header->nz;
@@ -408,8 +407,10 @@ char* merge_RC4_Parts(	const char*	 folderpath,
 		fseek(partFiles[i], RC_HEADER_LENGTH, SEEK_SET);
 	}
 
-	// write RC header to compressed_filename
-	serialize_recode_header(target_fp, rcHeader);
+	// write header to compressed_filename
+	// serialize the number of frames in the header
+	header->nz = total_frames;
+	serialize_recode_header(target_fp, header);
 
 	if (input_params->rc_operation_mode == RC_MODE_REDUCE_COMPRESS) {
 		for (frame_id = 0; frame_id < total_frames; frame_id++) {
@@ -444,6 +445,7 @@ char* merge_RC4_Parts(	const char*	 folderpath,
 	}
 	fclose(target_fp);
 
+	free(header);
 	free(compressedBinaryImage);
 	free(process_id_num_frames_map);
 	free(frame_process_id_map);

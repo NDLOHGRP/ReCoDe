@@ -67,6 +67,7 @@ to run:		export OMP_NUM_THREADS=11
 #include "L3.h"
 #include "L4.h"
 
+#include "recode_tests.c"
 
 char* reduceCompress(
 	uint8_t	    process_id,
@@ -149,10 +150,10 @@ int de (InitParams *init_params) {
 	Save decoded-expanded image
 	==========================================================================================
 	*/
-	char *image_name = getFilenameFromPath (init_params->image_filename);
-	char *s = get_filename_sans_extension (image_name);
+	//char *image_name = getFilenameFromPath (init_params->image_filename);
+	char *s = get_filename_sans_extension ((char*)&(de_header->source_file_name));
     char *outDir = format_directory_path(init_params->output_directory);
-    char *out_fname = concat(outDir, concat("Recoded_", s));
+    char *out_fname = concat(outDir, concat("Recoded_", concat(s,".bin")));
     
     printf("to %s\n", out_fname);
 	FILE *fp = fopen (out_fname, "wb+");
@@ -174,9 +175,13 @@ int de (InitParams *init_params) {
 	return 0;
 }
 
-int mr (InitParams *init_params) {
+int merge (InitParams *init_params) {
 
-	// read and validate input parameters
+	/*
+	==========================================================================================
+	Read and Validate Input Parameters
+	==========================================================================================
+	*/
 	InputParams *params = (InputParams *)malloc(sizeof(InputParams));
 	get_input_params(init_params->params_filename, &params);
 
@@ -185,21 +190,15 @@ int mr (InitParams *init_params) {
 	Process Inputs
 	==========================================================================================
 	*/
-	char *darkFile = init_params->dark_filename;
 	char *imageFile = init_params->image_filename;
+	const char *image_name = getFilenameFromPath(imageFile);
 	char *outDir = format_directory_path(init_params->output_directory);
-
+	
 	/*
 	==========================================================================================
-	Create ReCoDE header
+	Make Intermediate File Names
 	==========================================================================================
 	*/
-	RCHeader *header = (RCHeader *)malloc(sizeof(RCHeader));
-	const char *image_name = getFilenameFromPath(imageFile);
-	const char *dark_name = getFilenameFromPath(darkFile);
-	create_recode_header(params, -1, image_name, "", &header);
-	print_recode_header(header);
-
 	char** part_filenames = (char**)malloc((params->num_threads) * sizeof(char*));
 	int part_num;
 	for (part_num = 0; part_num < params->num_threads; part_num++) {
@@ -214,7 +213,7 @@ int mr (InitParams *init_params) {
 	*/
 	printf("Merging part files.\n");
 	if (params->reduction_level == 1) {
-		char* fname = merge_RC1_Parts(outDir, part_filenames, header, params, concat(outDir, (const char*)image_name));
+		char* fname = merge_RC1_Parts(outDir, part_filenames, params);
 	}
 	else if (params->reduction_level == 2) {
 		//char* fname = merge_RC2_Parts(outDir, part_filenames, params->num_threads, header, concat(outDir, (const char*)image_name));
@@ -223,13 +222,23 @@ int mr (InitParams *init_params) {
 		//char* fname = merge_RC3_Parts(outDir, part_filenames, params->num_threads, header, concat(outDir, (const char*)image_name));
 	}
 	else if (params->reduction_level == 4) {
-		char* fname = merge_RC4_Parts(outDir, part_filenames, header, params, concat(outDir, (const char*)image_name));
+		char* fname = merge_RC4_Parts(outDir, part_filenames, params, concat(outDir, (const char*)image_name));
 	}
 	printf("Done.\n");
+
+
+	for (part_num = 0; part_num < params->num_threads; part_num++) {
+		free(part_filenames[part_num]);
+	}
+	free(params);
+	free(part_filenames);
 
 	return 0;
 }
 
+int tests (InitParams *init_params) {
+	return _sequence_file_read_test();
+}
 
 int rc (InitParams *init_params) {
 	
@@ -407,13 +416,13 @@ int rc (InitParams *init_params) {
 	*/
 	printf("Merging part files.\n");
 	if (params->reduction_level == 1) {
-		char* fname = merge_RC1_Parts(outDir, part_filenames, header, params, concat(outDir, (const char*)image_name));
+		char* fname = merge_RC1_Parts(outDir, part_filenames, params);
 	} else if (params->reduction_level == 2) {
 		//char* fname = merge_RC2_Parts(outDir, part_filenames, params->num_threads, header, concat(outDir, (const char*)image_name));
 	} else if (params->reduction_level == 3) {
 		//char* fname = merge_RC3_Parts(outDir, part_filenames, params->num_threads, header, concat(outDir, (const char*)image_name));
 	} else if (params->reduction_level == 4) {
-		char* fname = merge_RC4_Parts(outDir, part_filenames, header, params, concat(outDir, (const char*)image_name));
+		char* fname = merge_RC4_Parts(outDir, part_filenames, params, concat(outDir, (const char*)image_name));
 	}
 	printf("Done.\n");
 	
@@ -453,7 +462,10 @@ int _tmain(int argc, TCHAR * argv[]) {
 		de(init_params);
 	}
 	else if (init_params->mode == 2) {
-		mr(init_params);
+		merge(init_params);
+	}
+	else if (init_params->mode == 3) {
+		tests(init_params);
 	}
 	else {
 		printf("Failed to initialize. Unknown mode: %d. Acceptable modes are: -rc and -de", init_params->mode);

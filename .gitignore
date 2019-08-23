@@ -2,3 +2,4 @@ scratch/
 win32/CMakeFiles/
 lib/
 *.ini
+data/large_files

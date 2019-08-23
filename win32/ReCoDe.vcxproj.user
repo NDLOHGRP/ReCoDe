@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LocalDebuggerCommandArguments>-mr -i D:\cbis\GitHub\ReCoDe\scratch\_run1.rc1_part000 -o "D:\cbis\GitHub\ReCoDe\scratch\_"</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-merge -i D:\cbis\GitHub\ReCoDe\scratch\_run1.rc1_part000 -o "D:\cbis\GitHub\ReCoDe\scratch" -p "D:\cbis\GitHub\ReCoDe\config\recode_params.txt" -n _run1</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerCommandArguments>-mr -i D:\cbis\GitHub\ReCoDe\data\Frames_0_3_12-13-59.436.bin -d "D:\cbis\GitHub\ReCoDe\data\Dark_Frame_12-23-00.232.bin" -o "D:\cbis\GitHub\ReCoDe\scratch" -p "D:\cbis\GitHub\ReCoDe\config\recode_params.txt" -n _run1</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-merge -i D:\cbis\GitHub\ReCoDe\scratch\_run1.rc1_part000 -o "D:\cbis\GitHub\ReCoDe\scratch" -p "D:\cbis\GitHub\ReCoDe\config\recode_params.txt" -n _run1</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">

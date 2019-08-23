@@ -19,18 +19,18 @@ d:\cbis\github\recode\src\mrchandler.h(135): warning C4477: 'printf' : format st
   d:\cbis\github\recode\src\mrchandler.h(135): note: consider using '%llu' in the format string
   d:\cbis\github\recode\src\mrchandler.h(135): note: consider using '%Iu' in the format string
   d:\cbis\github\recode\src\mrchandler.h(135): note: consider using '%I64u' in the format string
-d:\cbis\github\recode\src\sequence_reader.h(181): warning C4244: 'argument': conversion from 'uint64_t' to 'long', possible loss of data
-d:\cbis\github\recode\src\sequence_reader.h(196): warning C4244: 'argument': conversion from 'uint64_t' to 'long', possible loss of data
-d:\cbis\github\recode\src\sequence_reader.h(217): warning C4244: 'argument': conversion from 'uint64_t' to 'long', possible loss of data
-d:\cbis\github\recode\src\sequence_reader.h(231): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 2 has type 'uint64_t'
-  d:\cbis\github\recode\src\sequence_reader.h(231): note: consider using '%lld' in the format string
-  d:\cbis\github\recode\src\sequence_reader.h(231): note: consider using '%Id' in the format string
-  d:\cbis\github\recode\src\sequence_reader.h(231): note: consider using '%I64d' in the format string
-d:\cbis\github\recode\src\sequence_reader.h(231): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 3 has type 'uint64_t'
-  d:\cbis\github\recode\src\sequence_reader.h(231): note: consider using '%lld' in the format string
-  d:\cbis\github\recode\src\sequence_reader.h(231): note: consider using '%Id' in the format string
-  d:\cbis\github\recode\src\sequence_reader.h(231): note: consider using '%I64d' in the format string
-d:\cbis\github\recode\src\sequence_reader.h(349): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\sequence_reader.h(206): warning C4244: 'argument': conversion from 'uint64_t' to 'long', possible loss of data
+d:\cbis\github\recode\src\sequence_reader.h(221): warning C4244: 'argument': conversion from 'uint64_t' to 'long', possible loss of data
+d:\cbis\github\recode\src\sequence_reader.h(242): warning C4244: 'argument': conversion from 'uint64_t' to 'long', possible loss of data
+d:\cbis\github\recode\src\sequence_reader.h(256): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 2 has type 'uint64_t'
+  d:\cbis\github\recode\src\sequence_reader.h(256): note: consider using '%lld' in the format string
+  d:\cbis\github\recode\src\sequence_reader.h(256): note: consider using '%Id' in the format string
+  d:\cbis\github\recode\src\sequence_reader.h(256): note: consider using '%I64d' in the format string
+d:\cbis\github\recode\src\sequence_reader.h(256): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 3 has type 'uint64_t'
+  d:\cbis\github\recode\src\sequence_reader.h(256): note: consider using '%lld' in the format string
+  d:\cbis\github\recode\src\sequence_reader.h(256): note: consider using '%Id' in the format string
+  d:\cbis\github\recode\src\sequence_reader.h(256): note: consider using '%I64d' in the format string
+d:\cbis\github\recode\src\sequence_reader.h(374): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
 d:\cbis\github\recode\src\commons.h(68): warning C4018: '<': signed/unsigned mismatch
 d:\cbis\github\recode\src\commons.h(69): warning C4018: '<': signed/unsigned mismatch
 d:\cbis\github\recode\src\commons.h(11): warning C4477: 'printf' : format string '%lu' requires an argument of type 'unsigned long', but variadic argument 1 has type 'uint64_t'
@@ -61,33 +61,33 @@ d:\cbis\github\recode\src\argparser.h(26): warning C4244: '=': conversion from '
 d:\cbis\github\recode\src\L1.h(29): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
 d:\cbis\github\recode\src\L1.h(66): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
 d:\cbis\github\recode\src\L1.h(84): warning C4244: 'initializing': conversion from 'double' to 'unsigned short', possible loss of data
-d:\cbis\github\recode\src\L1.h(91): warning C4018: '<': signed/unsigned mismatch
-d:\cbis\github\recode\src\L1.h(117): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-d:\cbis\github\recode\src\L1.h(143): warning C4244: 'initializing': conversion from 'uint64_t' to 'uint32_t', possible loss of data
-d:\cbis\github\recode\src\L1.h(147): warning C4244: '=': conversion from 'double' to 'uint32_t', possible loss of data
-d:\cbis\github\recode\src\L1.h(170): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
-d:\cbis\github\recode\src\L1.h(230): warning C4476: 'printf' : unknown type field character '(' in format specifier
-d:\cbis\github\recode\src\L1.h(241): warning C4476: 'printf' : unknown type field character '(' in format specifier
-d:\cbis\github\recode\src\L1.h(272): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
-d:\cbis\github\recode\src\L1.h(364): warning C4244: 'initializing': conversion from 'uint64_t' to 'uint32_t', possible loss of data
-d:\cbis\github\recode\src\L1.h(365): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
-d:\cbis\github\recode\src\L1.h(370): warning C4244: 'argument': conversion from 'double' to 'std::size_t', possible loss of data
-d:\cbis\github\recode\src\L1.h(372): warning C4244: 'argument': conversion from 'double' to 'std::size_t', possible loss of data
-d:\cbis\github\recode\src\L1.h(400): warning C4244: 'argument': conversion from 'unsigned short' to 'uint8_t', possible loss of data
-d:\cbis\github\recode\src\L1.h(488): warning C4018: '<': signed/unsigned mismatch
-d:\cbis\github\recode\src\L1.h(539): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
-d:\cbis\github\recode\src\L1.h(540): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
-d:\cbis\github\recode\src\L1.h(574): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-d:\cbis\github\recode\src\L1.h(588): warning C4244: 'initializing': conversion from 'double' to 'uint8_t', possible loss of data
-d:\cbis\github\recode\src\L1.h(591): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
-d:\cbis\github\recode\src\L1.h(592): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
-d:\cbis\github\recode\src\L1.h(616): warning C4244: '=': conversion from 'double' to 'uint64_t', possible loss of data
-d:\cbis\github\recode\src\L1.h(640): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
-d:\cbis\github\recode\src\L1.h(643): warning C4244: '+=': conversion from 'uint64_t' to 'uint16_t', possible loss of data
-d:\cbis\github\recode\src\L1.h(654): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 1 has type 'uint64_t'
-  d:\cbis\github\recode\src\L1.h(654): note: consider using '%lld' in the format string
-  d:\cbis\github\recode\src\L1.h(654): note: consider using '%Id' in the format string
-  d:\cbis\github\recode\src\L1.h(654): note: consider using '%I64d' in the format string
+d:\cbis\github\recode\src\L1.h(96): warning C4018: '<': signed/unsigned mismatch
+d:\cbis\github\recode\src\L1.h(125): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+d:\cbis\github\recode\src\L1.h(151): warning C4244: 'initializing': conversion from 'uint64_t' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(155): warning C4244: '=': conversion from 'double' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(179): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(239): warning C4476: 'printf' : unknown type field character '(' in format specifier
+d:\cbis\github\recode\src\L1.h(250): warning C4476: 'printf' : unknown type field character '(' in format specifier
+d:\cbis\github\recode\src\L1.h(281): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(373): warning C4244: 'initializing': conversion from 'uint64_t' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(374): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(379): warning C4244: 'argument': conversion from 'double' to 'std::size_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(381): warning C4244: 'argument': conversion from 'double' to 'std::size_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(409): warning C4244: 'argument': conversion from 'unsigned short' to 'uint8_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(497): warning C4018: '<': signed/unsigned mismatch
+d:\cbis\github\recode\src\L1.h(549): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(550): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(584): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+d:\cbis\github\recode\src\L1.h(598): warning C4244: 'initializing': conversion from 'double' to 'uint8_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(601): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(602): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(626): warning C4244: '=': conversion from 'double' to 'uint64_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(650): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(653): warning C4244: '+=': conversion from 'uint64_t' to 'uint16_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(664): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 1 has type 'uint64_t'
+  d:\cbis\github\recode\src\L1.h(664): note: consider using '%lld' in the format string
+  d:\cbis\github\recode\src\L1.h(664): note: consider using '%Id' in the format string
+  d:\cbis\github\recode\src\L1.h(664): note: consider using '%I64d' in the format string
 d:\cbis\github\recode\src\L2.h(40): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
 d:\cbis\github\recode\src\L2.h(41): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
 d:\cbis\github\recode\src\L2.h(42): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
@@ -187,9 +187,11 @@ d:\cbis\github\recode\src\L4.h(644): warning C4244: 'initializing': conversion f
 ..\..\src\fly.cpp(644): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 1 has type 'std::size_t'
   ..\..\src\fly.cpp(644): note: consider using '%zd' in the format string
   Generating code
-  14 of 78 functions (17.9%) were compiled, the rest were copied from previous compilation.
+d:\cbis\github\recode\src\commons.h(202): warning C4715: 'loadData': not all control paths return a value
+d:\cbis\github\recode\src\initparser.h(216): warning C4715: 'parse_recode_server_init_params': not all control paths return a value
+  78 of 80 functions (97.5%) were compiled, the rest were copied from previous compilation.
     2 functions were new in current compilation
-    2 functions had inline decision re-evaluated but remain unchanged
+    0 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   OnTheFlyReCoDe.vcxproj -> D:\cbis\GitHub\ReCoDe\win32\x64\Release\OnTheFlyReCoDe.exe
   OnTheFlyReCoDe.vcxproj -> D:\cbis\GitHub\ReCoDe\win32\x64\Release\OnTheFlyReCoDe.pdb (Full PDB)

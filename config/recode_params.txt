@@ -92,4 +92,4 @@ Keep_Dark_Data = 1
 # 0 = Binary, 1 = MRC, 2 = Sequence, 3 = Others
 # the parameter is used to decide the position and size of the original file's header
 # source_file_type = 1 (i.e MRC file), original file's header is pre-fixed to RC header, else original file's header is post-fixed to end of compressed RC data
-Dark_File_Type = 0
+Dark_File_Type = 2
