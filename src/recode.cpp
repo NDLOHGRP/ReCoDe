@@ -100,19 +100,22 @@ char* reduceCompress(
 
 }
 
-void decompressExpand(const char* compressed_filename, uint16_t **frameBuffer, RCHeader **header) {
+//void decompressExpand(const char* compressed_filename, uint16_t **frameBuffer, RCHeader **header) {
+void decompressExpand(FILE* rc_fp, const char* out_filename, RCHeader *header) {
 
-	FILE* fp = fopen(compressed_filename, "rb");
-	parse_recode_header(fp, header);
+	//FILE* fp = fopen(compressed_filename, "rb");
+	//parse_recode_header(fp, out_fp);
 
-	if ((*header)->reduction_level == 1) {
-		if ((*header)->recode_operation_mode == 0) {
-			return decompressExpand_L1_Reduced_Only(fp, frameBuffer, header);
+	if (header->reduction_level == 1) {
+		if (header->recode_operation_mode == 0) {
+			return decompressExpand_L1_Reduced_Only(rc_fp, out_filename, header);
 		}
-		else if ((*header)->recode_operation_mode == 1) {
-			return decompressExpand_L1_Reduced_Compressed(fp, frameBuffer, header);
+		else if (header->recode_operation_mode == 1) {
+			//return decompressExpand_L1_Reduced_Compressed(rc_fp, out_filename, header);
+			return decompressExpand_L1_Reduced_Compressed_Sparse(rc_fp, out_filename, header);
 		}
 	}
+	/*
 	else if ((*header)->reduction_level == 2) {
 		return decompressExpand_L2(fp, frameBuffer, header);
 	}
@@ -128,8 +131,9 @@ void decompressExpand(const char* compressed_filename, uint16_t **frameBuffer, R
 			return _decompressExpand_L4(fp, frameBuffer, header);
 		}
 	}
+	*/
 	else {
-		printf("Error in function decompressExpand() in recode.cpp. ReCoDe has reduction levels 1 to 4. %d is not a supported level. This could indicate that the source file is not a ReCoDe file.\n", (*header)->reduction_level);
+		printf("Error in function decompressExpand() in recode.cpp. ReCoDe has reduction levels 1 to 4. %d is not a supported level. This could indicate that the source file is not a ReCoDe file.\n", header->reduction_level);
 	}
 }
 
@@ -141,25 +145,33 @@ int de (InitParams *init_params) {
 	==========================================================================================
 	*/
     printf("Decompressing and expanding %s ", init_params->image_filename);
-	uint16_t *de_frameBuffer16;
 	RCHeader *de_header = (RCHeader *)malloc(sizeof(RCHeader));
-	decompressExpand (init_params->image_filename, &de_frameBuffer16, &de_header);
+	FILE* fp = fopen(init_params->image_filename, "rb");
+	parse_recode_header(fp, &de_header);
+	//uint16_t *de_frameBuffer16;
+	//decompressExpand (init_params->image_filename, &de_frameBuffer16, &de_header);
 	
 	/*
 	========================================================================================== 
-	Save decoded-expanded image
+	Create decoded-expanded image file
 	==========================================================================================
 	*/
 	//char *image_name = getFilenameFromPath (init_params->image_filename);
 	char *s = get_filename_sans_extension ((char*)&(de_header->source_file_name));
     char *outDir = format_directory_path(init_params->output_directory);
     char *out_fname = concat(outDir, concat("Recoded_", concat(s,".bin")));
-    
     printf("to %s\n", out_fname);
-	FILE *fp = fopen (out_fname, "wb+");
-	uint32_t n_pixels = de_header->nx * de_header->ny * de_header->nz;
 
-	fwrite (de_frameBuffer16, sizeof(uint16_t), n_pixels, fp);
+	/*
+	==========================================================================================
+	Decompress-Expand
+	==========================================================================================
+	*/
+	decompressExpand(fp, out_fname, de_header);
+
+	//FILE *fp = fopen (out_fname, "wb+");
+	//uint32_t n_pixels = de_header->nx * de_header->ny * de_header->nz;
+	//fwrite (de_frameBuffer16, sizeof(uint16_t), n_pixels, fp);
 	fclose(fp);
 	printf("Done.\n");
 	
@@ -170,7 +182,7 @@ int de (InitParams *init_params) {
 	*/
 	free(s);
 	free(de_header);
-	free(de_frameBuffer16);
+	//free(de_frameBuffer16);
 
 	return 0;
 }

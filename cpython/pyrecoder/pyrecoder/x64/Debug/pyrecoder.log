@@ -1,5 +1,0 @@
-﻿  pyrecoder.cpp
-d:\cbis\github\recode\src\pyrecoder.cpp(45): warning C4312: 'type cast': conversion from 'int' to 'PyObject *' of greater size
-     Creating library D:\cbis\GitHub\ReCoDe\cpython\pyrecoder\x64\Debug\pyrecoder_d.lib and object D:\cbis\GitHub\ReCoDe\cpython\pyrecoder\x64\Debug\pyrecoder_d.exp
-  pyrecoder.vcxproj -> D:\cbis\GitHub\ReCoDe\cpython\pyrecoder\x64\Debug\pyrecoder_d.pyd
-  pyrecoder.vcxproj -> D:\cbis\GitHub\ReCoDe\cpython\pyrecoder\x64\Debug\pyrecoder_d.pdb (Full PDB)
