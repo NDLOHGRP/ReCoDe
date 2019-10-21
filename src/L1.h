@@ -696,7 +696,7 @@ void decompressExpand_L1_Reduced_Compressed_Sparse (FILE* rc_fp, const char *out
 	uint32_t n_bytes_in_image = ceil(n_pixels_in_frame * byte_depth);							// number of bytes needed to hold pixvals
 
 	uint64_t sz_frameBuffer = n_pixels_in_frame * 3;
-	uint32_t *frameBuffer = (uint32_t *)malloc(sz_frameBuffer);
+	uint16_t *frameBuffer = (uint16_t *)malloc(sz_frameBuffer);
 
 	uint32_t frame_id = 0;
 	uint32_t *n_compressed_bytes_in_binary_image = (uint32_t *)malloc((header->nz) * sizeof(uint32_t));
@@ -735,7 +735,8 @@ void decompressExpand_L1_Reduced_Compressed_Sparse (FILE* rc_fp, const char *out
 		decompress_stream(-1, -1, compressedPixvals, deCompressedPixvals, n_compressed_bytes_in_pixvals[frame_id], n_bytes_in_packed_pixvals[frame_id]);
 
 		//uint32_t frame_start_linear_index = n_pixels_in_frame * frame_id;
-		uint32_t row, col, linear_pixel_index, pixel_bit_index_frame;
+		uint16_t row, col;
+		uint32_t linear_pixel_index, pixel_bit_index_frame;
 		//uint64_t pixel_bit_index_dataset;
 		uint64_t n_fg_pixels = 0;
 		for (row = 0; row < ny; row++) {
@@ -752,14 +753,16 @@ void decompressExpand_L1_Reduced_Compressed_Sparse (FILE* rc_fp, const char *out
 							extracted_pixval += pow2_lookup_table[n];
 						}
 					}
-					frameBuffer[n_fg_pixels * 3] = frame_id;
-					frameBuffer[n_fg_pixels * 3 + 1] = linear_pixel_index;
-					frameBuffer[n_fg_pixels * 3 + 2] = (uint32_t)extracted_pixval;
+					frameBuffer[n_fg_pixels * 3] = row;
+					frameBuffer[n_fg_pixels * 3 + 1] = col;
+					frameBuffer[n_fg_pixels * 3 + 2] = extracted_pixval;
+					printf("%d, %d, %d\n", frameBuffer[n_fg_pixels * 3], frameBuffer[n_fg_pixels * 3 + 1], frameBuffer[n_fg_pixels * 3 + 2]);
 					n_fg_pixels++;
 				}
 			}
 		}
-		fwrite(frameBuffer, sizeof(uint32_t), n_fg_pixels * 3, out_fp);
+		fwrite(&n_fg_pixels, sizeof(uint32_t), 1, out_fp);
+		fwrite(frameBuffer, sizeof(uint16_t), n_fg_pixels * 3, out_fp);
 		printf("Decoded Frame %" PRIu32 " with %" PRIu64 " foreground pixels\n", frame_id, n_fg_pixels);
 	}
 

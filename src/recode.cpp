@@ -36,14 +36,23 @@ to run:		export OMP_NUM_THREADS=11
 #include "lz4.h"
 #endif
 
-#include <tchar.h>
-#include <wchar.h>
+#if defined(_MSC_VER)
+# include <windows.h>
+# include <tchar.h>
+#else
+# define TCHAR		char
+# define _T(x)		x
+# define _tprintf	printf
+# define _tmain		main
+#endif
+
 #include <SimpleOpt.h>
 
 #ifdef _WIN32
 	#include <win32\dirent.h>
 #else
 	#include <dirent.h>
+	#include <ctype.h>
 #endif
 
 #include "recodefs.h"
@@ -459,7 +468,6 @@ int rc (InitParams *init_params) {
 }
 
 
-#ifdef _WIN32
 int _tmain(int argc, TCHAR * argv[]) {
 
 	InitParams *init_params = (InitParams *)malloc(sizeof(InitParams));
@@ -487,29 +495,7 @@ int _tmain(int argc, TCHAR * argv[]) {
 		exit(0);
 	}
 }
-#else
-int main(int argc, char *argv[]) {
 
-	InitParams *init_params = (InitParams *)malloc(sizeof(InitParams));
-	parse_init_params(argc, argv, &init_params);
-	
-	VERBOSITY = init_params->verbosity;
-
-	if (init_params->mode == 0) {
-		rc(init_params);
-	}
-	else if (init_params->mode == 1) {
-		de(init_params);
-	} else {
-		printf("Failed to initialize. Unknown mode: %d. Acceptable modes are: -rc and -de", init_params->mode);
-		fprintf(stderr, "Usage::\n");
-		fprintf(stderr, "./recode -rc <input image filename> <dark image filename> <input parameter filename> <output directory>\n");
-		fprintf(stderr, "./recode -de <recode filename> <output directory>\n");
-		exit(0);
-	}
-
-}
-#endif
 /*
 extern "C"
 {

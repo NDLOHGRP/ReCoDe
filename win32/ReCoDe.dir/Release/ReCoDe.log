@@ -1,12 +1,12 @@
 ﻿  recode.cpp
 D:\cbis\GitHub\ReCoDe\win32\/../include\win32\dirent.h(1102): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
 D:\cbis\GitHub\ReCoDe\win32\/../include\win32\dirent.h(1185): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
-d:\cbis\github\recode\src\initparser.h(220): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 1 has type 'int64_t'
-  d:\cbis\github\recode\src\initparser.h(220): note: consider using '%lld' in the format string
-  d:\cbis\github\recode\src\initparser.h(220): note: consider using '%Id' in the format string
-  d:\cbis\github\recode\src\initparser.h(220): note: consider using '%I64d' in the format string
-d:\cbis\github\recode\src\initparser.h(244): warning C4477: 'printf' : format string '%s' requires an argument of type 'char *', but variadic argument 1 has type 'int'
-d:\cbis\github\recode\src\initparser.h(244): warning C4313: 'printf': '%s' in format string conflicts with argument 1 of type 'int'
+d:\cbis\github\recode\src\initparser.h(230): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 1 has type 'int64_t'
+  d:\cbis\github\recode\src\initparser.h(230): note: consider using '%lld' in the format string
+  d:\cbis\github\recode\src\initparser.h(230): note: consider using '%Id' in the format string
+  d:\cbis\github\recode\src\initparser.h(230): note: consider using '%I64d' in the format string
+d:\cbis\github\recode\src\initparser.h(254): warning C4477: 'printf' : format string '%s' requires an argument of type 'char *', but variadic argument 1 has type 'int'
+d:\cbis\github\recode\src\initparser.h(254): warning C4313: 'printf': '%s' in format string conflicts with argument 1 of type 'int'
 d:\cbis\github\recode\src\recode_utils.h(103): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
 d:\cbis\github\recode\src\mrchandler.h(123): warning C4244: 'argument': conversion from 'uint64_t' to 'long', possible loss of data
 d:\cbis\github\recode\src\mrchandler.h(128): warning C4244: 'argument': conversion from 'uint64_t' to 'double', possible loss of data
@@ -88,8 +88,8 @@ d:\cbis\github\recode\src\L1.h(692): warning C4244: 'initializing': conversion f
 d:\cbis\github\recode\src\L1.h(695): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
 d:\cbis\github\recode\src\L1.h(696): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
 d:\cbis\github\recode\src\L1.h(720): warning C4244: '=': conversion from 'double' to 'uint64_t', possible loss of data
-d:\cbis\github\recode\src\L1.h(749): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
-d:\cbis\github\recode\src\L1.h(752): warning C4244: '+=': conversion from 'uint64_t' to 'uint16_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(750): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(753): warning C4244: '+=': conversion from 'uint64_t' to 'uint16_t', possible loss of data
 d:\cbis\github\recode\src\L2.h(40): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
 d:\cbis\github\recode\src\L2.h(41): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
 d:\cbis\github\recode\src\L2.h(42): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
@@ -156,13 +156,13 @@ d:\cbis\github\recode\src\L4.h(575): warning C4474: 'printf' : too many argument
   d:\cbis\github\recode\src\L4.h(575): note: placeholders and their parameters expect 1 variadic arguments, but 2 were provided
 d:\cbis\github\recode\src\L4.h(618): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
 d:\cbis\github\recode\src\L4.h(646): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
-D:\cbis\GitHub\ReCoDe\src\recode.cpp(352): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
-D:\cbis\GitHub\ReCoDe\src\recode.cpp(393): warning C4244: 'initializing': conversion from 'uint64_t' to 'unsigned long', possible loss of data
-D:\cbis\GitHub\ReCoDe\src\recode.cpp(376): warning C4101: 'nz': unreferenced local variable
-d:\cbis\github\recode\src\initparser.h(221): warning C4715: 'parse_recode_server_init_params': not all control paths return a value
-d:\cbis\github\recode\src\initparser.h(366): warning C4715: 'parse_init_params': not all control paths return a value
+D:\cbis\GitHub\ReCoDe\src\recode.cpp(361): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+D:\cbis\GitHub\ReCoDe\src\recode.cpp(402): warning C4244: 'initializing': conversion from 'uint64_t' to 'unsigned long', possible loss of data
+D:\cbis\GitHub\ReCoDe\src\recode.cpp(385): warning C4101: 'nz': unreferenced local variable
+d:\cbis\github\recode\src\initparser.h(231): warning C4715: 'parse_recode_server_init_params': not all control paths return a value
+d:\cbis\github\recode\src\initparser.h(376): warning C4715: 'parse_init_params': not all control paths return a value
 d:\cbis\github\recode\src\commons.h(202): warning C4715: 'loadData': not all control paths return a value
 d:\cbis\github\recode\src\argparser.h(189): warning C4715: 'validate_input_params': not all control paths return a value
 d:\cbis\github\recode\src\l4.h(573): warning C4700: uninitialized local variable 'offset' used
-d:\cbis\github\recode\src\recode.cpp(101): warning C4715: 'reduceCompress': not all control paths return a value
+d:\cbis\github\recode\src\recode.cpp(110): warning C4715: 'reduceCompress': not all control paths return a value
   ReCoDe.vcxproj -> D:\cbis\GitHub\ReCoDe\win32\x64\Release\ReCoDe.exe

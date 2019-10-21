@@ -40,6 +40,7 @@ int char_to_int(char *d) {
 	return (int)val;
 }
 
+#ifdef _WIN32
 int wchar_to_int(wchar_t *src) {
 	uint64_t L = wcslen(src);
 	char *dst = (char*)malloc(sizeof(char)*L);
@@ -55,6 +56,15 @@ char* wchar_to_char(wchar_t *src) {
 	dst[L] = '\0';
 	return dst;
 }
+#else
+int wchar_to_int(char *src) {
+	return char_to_int(src);
+}
+
+char* wchar_to_char(char *src) {
+	return src;
+}
+#endif
 
 /*
 int wchar_to_int(char *src) {
