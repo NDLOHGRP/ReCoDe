@@ -756,7 +756,6 @@ void decompressExpand_L1_Reduced_Compressed_Sparse (FILE* rc_fp, const char *out
 					frameBuffer[n_fg_pixels * 3] = row;
 					frameBuffer[n_fg_pixels * 3 + 1] = col;
 					frameBuffer[n_fg_pixels * 3 + 2] = extracted_pixval;
-					printf("%d, %d, %d\n", frameBuffer[n_fg_pixels * 3], frameBuffer[n_fg_pixels * 3 + 1], frameBuffer[n_fg_pixels * 3 + 2]);
 					n_fg_pixels++;
 				}
 			}

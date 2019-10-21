@@ -45,7 +45,6 @@ to run:		export OMP_NUM_THREADS=11
 # define _tprintf	printf
 # define _tmain		main
 #endif
-
 #include <SimpleOpt.h>
 
 #ifdef _WIN32
