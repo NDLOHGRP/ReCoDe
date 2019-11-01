@@ -196,7 +196,6 @@ void runRCT_L1(
 				fwrite(pBuffer, sizeof(char), RCT_Buffer_Fill_Position, partFile);
 				//fwrite(&num_frames_in_part, sizeof(uint32_t), 1, partFile);		// serialize the number of frames at the end
 				nWrites++;
-				//recode_print("RCT %d: Why? Why? Why? Why?\n", process_id);
 
 				// serialize the number of frames in the header
 				fseek(partFile, 17, SEEK_SET);

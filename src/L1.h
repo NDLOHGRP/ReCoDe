@@ -594,7 +594,9 @@ char* merge_RC1_Parts (	const char   *folderpath,
 	return (char*)compressed_filename;
 }
 
-
+/*
+This function is provided for testing purposes only. No external pythonic calls to this function are available. Decompression to only sparse format is supported for external calls.
+*/
 void decompressExpand_L1_Reduced_Compressed ( FILE* rc_fp, const char *out_fname, RCHeader *header) {
 
 	// fp is assumed to point to end of header, as header was read using the same fp in recode.cpp
@@ -769,7 +771,64 @@ void decompressExpand_L1_Reduced_Compressed_Sparse (FILE* rc_fp, const char *out
 	recode_print("Done.\n");
 }
 
+/*
+this function is called by pyrecode_c.py
+*/
+void decompressExpand_L1_Reduced_Compressed_Frame_Sparse(
+	FILE* rc_fp, uint32_t nx, uint32_t ny, uint8_t bit_depth, 
+	uint32_t n_compressed_bytes_in_binary_image, uint32_t n_compressed_bytes_in_pixvals, uint32_t n_bytes_in_packed_pixvals, uint32_t n_bytes_in_binary_image,
+	uint8_t *compressedBinaryImage, uint8_t *deCompressedBinaryImage, uint8_t *compressedPixvals, uint8_t *deCompressedPixvals,
+	uint64_t *pow2_lookup_table,
+	uint16_t *frameBuffer
+) {
 
+	/*
+	rc_fp is assumed to point to beginning of a frame. Appropriate seek is handled by callers: pyrecode_c.py
+	*/
+
+	fread(compressedBinaryImage, sizeof(uint8_t), n_compressed_bytes_in_binary_image, rc_fp);
+	fread(compressedPixvals, sizeof(uint8_t), n_compressed_bytes_in_pixvals, rc_fp);
+
+	decompress_stream(-1, -1, compressedBinaryImage, deCompressedBinaryImage, n_compressed_bytes_in_binary_image, n_bytes_in_binary_image);
+	decompress_stream(-1, -1, compressedPixvals, deCompressedPixvals, n_compressed_bytes_in_pixvals, n_bytes_in_packed_pixvals);
+
+	uint16_t row, col;
+	uint32_t linear_pixel_index, pixel_bit_index_frame;
+	uint16_t extracted_pixval;
+	uint8_t n;
+	uint64_t n_fg_pixels = 0;
+
+	for (row = 0; row < ny; row++) {
+		for (col = 0; col < nx; col++) {
+			linear_pixel_index = row * nx + col;
+			if (CheckBit(deCompressedBinaryImage, linear_pixel_index) > 0) {
+				// unpack pixval
+				extracted_pixval = 0;
+				// Assumes LITTLE-ENDIAN Byte Order of pixval
+				for (n = 0; n < bit_depth; n++) {
+					pixel_bit_index_frame = n_fg_pixels*bit_depth + n;
+					if (CheckBit(deCompressedPixvals, pixel_bit_index_frame) > 0) {
+						extracted_pixval += pow2_lookup_table[n];
+					}
+				}
+				frameBuffer[n_fg_pixels * 3] = row;
+				frameBuffer[n_fg_pixels * 3 + 1] = col;
+				frameBuffer[n_fg_pixels * 3 + 2] = extracted_pixval;
+				n_fg_pixels++;
+			}
+		}
+	}
+	printf("Decoded Frame %" PRIu32 " with %" PRIu64 " foreground pixels\n", n_fg_pixels);
+
+}
+
+/*
+This function is provided for testing purposes only. No external pythonic calls to this function are available. Decompression to only sparse format is supported for external calls.
+*/
 void decompressExpand_L1_Reduced_Only(FILE* fp, const char *out_fname, RCHeader *header) {
+
+}
+
+void decompressExpand_L1_Reduced_Only_Sparse(FILE* fp, const char *out_fname, RCHeader *header) {
 
 }
