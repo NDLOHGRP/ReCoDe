@@ -75,7 +75,16 @@ class ReCoDeHeader():
             for field in self._rc_header_field_defs:
                 b = fp.read(field['bytes'])
                 value = np.frombuffer(b, dtype=field['dtype'])
-                self._rc_header[field['name']] = value
+                if field['name'] is 'dark_file_name':
+                    formatted_value = self._to_string(value)
+                elif field['name'] is 'source_file_name':
+                    formatted_value = self._to_string(value)
+                else:
+                    if len(value) == 1:
+                        formatted_value = value[0]
+                    else:
+                        formatted_value = value
+                self._rc_header[field['name']] = formatted_value
 
     def serialize(self, rc_filename):
         assert rc_filename != '', 'ReCoDe filename missing'
@@ -89,6 +98,8 @@ class ReCoDeHeader():
 
     def print(self):
         for field in self._rc_header_field_defs:
+            print(field['name'], '=', self._rc_header[field['name']])
+            '''
             if field['name'] is 'dark_file_name':
                 print(field['name'], '=', self._to_string(self._rc_header[field['name']]))
             elif field['name'] is 'source_file_name':
@@ -98,7 +109,8 @@ class ReCoDeHeader():
                     print(field['name'], '=', self._rc_header[field['name']][0])
                 else:
                     print(field['name'], '=', self._rc_header[field['name']])
-
+            '''
+            
     def validate(self):
         # check that no fields are present in header, does not check the validity of their values
         for field in self._rc_header_field_defs:

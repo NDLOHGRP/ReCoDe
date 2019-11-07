@@ -5,7 +5,7 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerCommandArguments>-de -i "D:\cbis\images\30-Aug-2019\400fps_dose_43\400fps_dose_43.rc1" -o "D:\cbis\images\30-Aug-2019\400fps_dose_43"</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-de -i "D:/cbis/GitHub/ReCoDe/scratch/400fps_dose_43.rc1" -o "D:/cbis/GitHub/ReCoDe/scratch/"</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">

@@ -121,6 +121,7 @@ void decompressExpand(FILE* rc_fp, const char* out_filename, RCHeader *header) {
 		else if (header->recode_operation_mode == 1) {
 			//return decompressExpand_L1_Reduced_Compressed(rc_fp, out_filename, header);
 			return decompressExpand_L1_Reduced_Compressed_Sparse(rc_fp, out_filename, header);
+			//return _h_decompressExpand_L1_Reduced_Compressed_Sparse(rc_fp, out_filename, header);
 		}
 	}
 	/*

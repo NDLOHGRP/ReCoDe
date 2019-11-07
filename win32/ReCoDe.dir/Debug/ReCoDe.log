@@ -78,18 +78,28 @@ d:\cbis\github\recode\src\L1.h(496): warning C4018: '<': signed/unsigned mismatc
 d:\cbis\github\recode\src\L1.h(551): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
 d:\cbis\github\recode\src\L1.h(552): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
 d:\cbis\github\recode\src\L1.h(591): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-d:\cbis\github\recode\src\L1.h(605): warning C4244: 'initializing': conversion from 'double' to 'uint8_t', possible loss of data
-d:\cbis\github\recode\src\L1.h(608): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
-d:\cbis\github\recode\src\L1.h(609): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
-d:\cbis\github\recode\src\L1.h(633): warning C4244: '=': conversion from 'double' to 'uint64_t', possible loss of data
-d:\cbis\github\recode\src\L1.h(662): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
-d:\cbis\github\recode\src\L1.h(665): warning C4244: '+=': conversion from 'uint64_t' to 'uint16_t', possible loss of data
-d:\cbis\github\recode\src\L1.h(692): warning C4244: 'initializing': conversion from 'double' to 'uint8_t', possible loss of data
-d:\cbis\github\recode\src\L1.h(695): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
-d:\cbis\github\recode\src\L1.h(696): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
-d:\cbis\github\recode\src\L1.h(720): warning C4244: '=': conversion from 'double' to 'uint64_t', possible loss of data
-d:\cbis\github\recode\src\L1.h(750): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
-d:\cbis\github\recode\src\L1.h(753): warning C4244: '+=': conversion from 'uint64_t' to 'uint16_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(607): warning C4244: 'initializing': conversion from 'double' to 'uint8_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(610): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(611): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(635): warning C4244: '=': conversion from 'double' to 'uint64_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(664): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(667): warning C4244: '+=': conversion from 'uint64_t' to 'uint16_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(694): warning C4244: 'initializing': conversion from 'double' to 'uint8_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(697): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(698): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(722): warning C4244: '=': conversion from 'double' to 'uint64_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(752): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(755): warning C4244: '+=': conversion from 'uint64_t' to 'uint16_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(857): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(859): warning C4244: '+=': conversion from 'uint64_t' to 'uint16_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(883): warning C4244: 'initializing': conversion from 'double' to 'uint8_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(886): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(887): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(911): warning C4244: '=': conversion from 'double' to 'uint64_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(934): warning C4244: 'initializing': conversion from 'double' to 'uint8_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(937): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(938): warning C4244: 'initializing': conversion from 'double' to 'uint32_t', possible loss of data
+d:\cbis\github\recode\src\L1.h(957): warning C4244: '=': conversion from 'double' to 'uint64_t', possible loss of data
 d:\cbis\github\recode\src\L2.h(40): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
 d:\cbis\github\recode\src\L2.h(41): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
 d:\cbis\github\recode\src\L2.h(42): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
@@ -164,5 +174,5 @@ d:\cbis\github\recode\src\initparser.h(231): warning C4715: 'parse_recode_server
 d:\cbis\github\recode\src\commons.h(202): warning C4715: 'loadData': not all control paths return a value
 d:\cbis\github\recode\src\argparser.h(189): warning C4715: 'validate_input_params': not all control paths return a value
 d:\cbis\github\recode\src\l4.h(573): warning C4700: uninitialized local variable 'offset' used
-d:\cbis\github\recode\src\recode.cpp(110): warning C4715: 'reduceCompress': not all control paths return a value
+d:\cbis\github\recode\src\recode.cpp(109): warning C4715: 'reduceCompress': not all control paths return a value
   ReCoDe.vcxproj -> D:\cbis\GitHub\ReCoDe\win32\x64\Debug\ReCoDe.exe

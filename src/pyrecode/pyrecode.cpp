@@ -55,12 +55,34 @@
 typedef struct {
 	PyObject_HEAD
 	FILE *file;
-	uint64_t current_frame_index;
+	uint16_t ny;
+	uint16_t nx;
+	uint8_t bit_depth;
+	uint8_t byte_depth;
+	uint32_t n_pixels_in_frame;				// number of pixels in the image
+	uint32_t n_bytes_in_binary_image;		// number of bytes needed to pack binary image
+	uint32_t n_bytes_in_image;				// number of bytes needed to hold pixvals
+	uint8_t *compressedBinaryImage;
+	uint8_t *deCompressedBinaryImage;
+	uint8_t *compressedPixvals;
+	uint8_t *deCompressedPixvals;
+	uint64_t pow2_lookup_table[64];
 } RecodeReader;
 
 static PyMemberDef ReCoDe_members[] = {
 	{ "file", T_OBJECT_EX, offsetof(RecodeReader, file), 0, "pointer to file" },
-	{ "current_frame_index", T_INT, offsetof(RecodeReader, current_frame_index), 0, "index of next frame to be read" },
+	{ "ny", T_USHORT, offsetof(RecodeReader, ny), 0, "rows in frame" },
+	{ "nx", T_USHORT, offsetof(RecodeReader, nx), 0, "cols in frame" },
+	{ "bit_depth", T_UBYTE, offsetof(RecodeReader, bit_depth), 0, "bits per pixel" },
+	{ "byte_depth", T_UBYTE, offsetof(RecodeReader, byte_depth), 0, "bytes per pixel" },
+	{ "n_pixels_in_frame", T_UINT, offsetof(RecodeReader, n_pixels_in_frame), 0, "bytes per frame" },
+	{ "n_bytes_in_binary_image", T_UINT, offsetof(RecodeReader, n_bytes_in_binary_image), 0, "bytes per frame" },
+	{ "n_bytes_in_image", T_UINT, offsetof(RecodeReader, n_bytes_in_image), 0, "bytes per frame" },
+	{ "compressedBinaryImage", T_OBJECT_EX, offsetof(RecodeReader, compressedBinaryImage), 0, "buffer for compressed binary image" },
+	{ "deCompressedBinaryImage", T_OBJECT_EX, offsetof(RecodeReader, deCompressedBinaryImage), 0, "buffer for de-compressed binary image" },
+	{ "compressedPixvals", T_OBJECT_EX, offsetof(RecodeReader, compressedPixvals), 0, "buffer for compressed pixel intensity values" },
+	{ "deCompressedPixvals", T_OBJECT_EX, offsetof(RecodeReader, deCompressedPixvals), 0, "buffer for de-compressed pixel intensity values" },
+	{ "pow2_lookup_table", T_ULONG, offsetof(RecodeReader, pow2_lookup_table), 0, "look-up table for bit unpacking" },
 	{ NULL }  /* Sentinel */
 };
 
@@ -71,7 +93,20 @@ ReCoDe_dealloc(RecodeReader *self)
 		fclose(self->file);
 		Py_XDECREF(self->file);
 	}
-	Py_XDECREF(self->current_frame_index);
+	/*
+	Py_XDECREF(self->nx);
+	Py_XDECREF(self->ny);
+	Py_XDECREF(self->bit_depth);
+	Py_XDECREF(self->byte_depth);
+	Py_XDECREF(self->n_pixels_in_frame);
+	Py_XDECREF(self->n_bytes_in_binary_image);
+	Py_XDECREF(self->n_bytes_in_image);
+	Py_XDECREF(self->compressedBinaryImage);
+	Py_XDECREF(self->deCompressedBinaryImage);
+	Py_XDECREF(self->compressedPixvals);
+	Py_XDECREF(self->deCompressedPixvals);
+	Py_XDECREF(self->pow2_lookup_table);
+	*/
 	Py_TYPE(self)->tp_free((PyObject *)self);
 }
 
@@ -82,9 +117,47 @@ ReCoDe_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 	self = (RecodeReader *)type->tp_alloc(type, 0);
 	if (self != NULL) {
 		self->file = NULL;
-		self->current_frame_index = 0;
+		self->ny = 0;
+		self->nx = 0;
+		self->bit_depth = 0;
+		self->byte_depth = 0;
+		self->n_pixels_in_frame = 0;									// number of pixels in the image
+		self->n_bytes_in_binary_image = 0;		// number of bytes needed to pack binary image
+		self->n_bytes_in_image = 0;		// number of bytes needed to hold pixvals
+		self->compressedBinaryImage = NULL;
+		self->deCompressedBinaryImage = NULL;
+		self->compressedPixvals = NULL;
+		self->deCompressedPixvals = NULL;
+		for (uint8_t t = 0; t < 64; t++) {
+			self->pow2_lookup_table[t] = pow(2, t);
+		}
 	}
 	return (PyObject *)self;
+}
+
+static PyObject *
+_create_read_buffers (RecodeReader* self, PyObject* args) {
+
+	uint16_t ny, nx;
+	uint8_t bit_depth;
+	if (!PyArg_ParseTuple(args, "HHb", &ny, &nx, &bit_depth)) {
+		printf("Failed to parse arguments in RecodeReader constructor. Expected three: ny, nx, bit_depth\n");
+		return Py_BuildValue("i", 0);
+	}
+	if (self != NULL) {
+		self->ny = ny;
+		self->nx = nx;
+		self->bit_depth = bit_depth;
+		self->byte_depth = ceil((self->bit_depth*1.0) / 8.0);
+		self->n_pixels_in_frame = (uint32_t)self->nx * (uint32_t)self->ny;									// number of pixels in the image
+		self->n_bytes_in_binary_image = ceil(self->n_pixels_in_frame / 8.0);		// number of bytes needed to pack binary image
+		self->n_bytes_in_image = ceil(self->n_pixels_in_frame * self->byte_depth);		// number of bytes needed to hold pixvals
+		self->compressedBinaryImage = (uint8_t*)calloc(self->n_bytes_in_binary_image, sizeof(uint8_t));
+		self->deCompressedBinaryImage = (uint8_t*)calloc(self->n_bytes_in_binary_image, sizeof(uint8_t));
+		self->compressedPixvals = (uint8_t*)calloc(self->n_bytes_in_image, sizeof(uint8_t));
+		self->deCompressedPixvals = (uint8_t*)calloc(self->n_bytes_in_image, sizeof(uint8_t));
+	}
+	return Py_BuildValue("i", 1);
 }
 
 PyObject * 
@@ -94,7 +167,7 @@ _open_file(RecodeReader* self, PyObject* args) {
 	if (!PyArg_ParseTuple(args, "s", &filename)) {
 		return Py_BuildValue("i", 0);
 	}
-	self->file = fopen(filename, "r");
+	self->file = fopen(filename, "rb");
 	if (self->file==NULL) {
 		return Py_BuildValue("i", 0);
 	}
@@ -115,17 +188,18 @@ _close_file(RecodeReader* self) {
 PyObject *
 _fseek(RecodeReader* self, PyObject* args) {
 
-	// handle linux with fseeko
-
-	uint64_t offset;
+	long offset;
 	int origin;
-	if (!PyArg_ParseTuple(args, "kI", &offset, &origin)) {
+	if (!PyArg_ParseTuple(args, "li", &offset, &origin)) {
 		printf("0\n");
 		return Py_BuildValue("i", 0);
 	}
-	printf("%d, %d\n", offset, origin);
+	printf("offset = %d, origin = %d\n", offset, origin);
 
-	int state = _fseeki64 (self->file, offset, origin);
+	//Since we are seeking on rc file, fseek will do
+	int state = fseek (self->file, offset, origin);
+	//int state = _fseeki64 (self->file, 248073, origin);
+	//int state = _fseeki64 (self->file, 248073, 0);
    	if (state)
     	return Py_BuildValue("i", 0);
 	else
@@ -179,46 +253,27 @@ PyObject *
 _get_frame_sparse_L1 (RecodeReader *self, PyObject* args) {
 
 	Py_buffer view_frameData;
-
-	/*To be moved to constructor*/
-	uint32_t ny = 512;
-	uint32_t nx = 4096;
-	uint8_t bit_depth = 12;
-	uint8_t byte_depth = ceil((bit_depth*1.0) / 8.0);
-
-	uint32_t n_pixels_in_frame = nx * ny;														// number of pixels in the image
-	uint32_t n_bytes_in_binary_image = ceil(n_pixels_in_frame / 8.0);							// number of bytes needed to pack binary image
-	uint32_t n_bytes_in_image = ceil(n_pixels_in_frame * byte_depth);							// number of bytes needed to hold pixvals
-
-	uint8_t *compressedBinaryImage = (uint8_t*)calloc(n_bytes_in_binary_image, sizeof(uint8_t));
-	uint8_t *deCompressedBinaryImage = (uint8_t*)calloc(n_bytes_in_binary_image, sizeof(uint8_t));
-	uint8_t *compressedPixvals = (uint8_t*)calloc(n_bytes_in_image, sizeof(uint8_t));
-	uint8_t *deCompressedPixvals = (uint8_t*)calloc(n_bytes_in_image, sizeof(uint8_t));
-
-	uint64_t pow2_lookup_table[64];
-	uint8_t	 t;
-	for (t = 0; t < 64; t++) {
-		pow2_lookup_table[t] = pow(2, t);
-	}
-	/*To be moved to constructor*/
-
 	uint32_t n_compressed_bytes_in_binary_image;
 	uint32_t n_compressed_bytes_in_pixvals;
 	uint32_t n_bytes_in_packed_pixvals;
+	uint8_t is_intermediate;
 
-	if (!PyArg_ParseTuple(args, "IIIy*", &n_compressed_bytes_in_binary_image, &n_compressed_bytes_in_pixvals, &n_bytes_in_packed_pixvals, &view_frameData)) {
+	if (!PyArg_ParseTuple(args, "IIIby*", &n_compressed_bytes_in_binary_image, &n_compressed_bytes_in_pixvals, &n_bytes_in_packed_pixvals, &is_intermediate, &view_frameData)) {
 		return Py_BuildValue("s", "Unable to parse argument frame_index");
+		return Py_BuildValue("k", 0);
 	}
-	printf("%d, %d, %d\n", n_compressed_bytes_in_binary_image, n_compressed_bytes_in_pixvals, n_bytes_in_packed_pixvals);
+	//printf("%d, %d, %d\n", n_compressed_bytes_in_binary_image, n_compressed_bytes_in_pixvals, n_bytes_in_packed_pixvals);
 
-	decompressExpand_L1_Reduced_Compressed_Frame_Sparse (
-		self->file, nx, ny, bit_depth, 
-		n_compressed_bytes_in_binary_image, n_compressed_bytes_in_pixvals, n_bytes_in_packed_pixvals, n_bytes_in_binary_image, 
-		compressedBinaryImage, deCompressedBinaryImage, compressedPixvals, deCompressedPixvals,
-		pow2_lookup_table,
-		(uint16_t *)(&view_frameData)->buf
+	//printf("current position (pyrecode.cpp): %d\n", ftell(self->file));
+	uint64_t n = decompressExpand_L1_Reduced_Compressed_Frame_Sparse (
+		self->file, self->nx, self->ny, self->bit_depth, 
+		n_compressed_bytes_in_binary_image, n_compressed_bytes_in_pixvals, n_bytes_in_packed_pixvals, self->n_bytes_in_binary_image, 
+		self->compressedBinaryImage, self->deCompressedBinaryImage, self->compressedPixvals, self->deCompressedPixvals,
+		self->pow2_lookup_table,
+		(uint16_t *)(&view_frameData)->buf,
+		is_intermediate
 	);
-	return Py_BuildValue("i", 1);
+	return Py_BuildValue("K", n);
 }
 
 
@@ -229,6 +284,7 @@ PyMethodDef ReCoDeMethods[] =
 	{ "_open_file", (PyCFunction)_open_file, METH_VARARGS, 0 },
 	{ "_close_file", (PyCFunction)_close_file, METH_VARARGS, 0 },
 	{ "_fseek", (PyCFunction)_fseek, METH_VARARGS, 0 },
+	{ "_create_read_buffers", (PyCFunction)_create_read_buffers, METH_VARARGS, 0 },
 	{ "_get_frame_sparse_L1", (PyCFunction)_get_frame_sparse_L1, METH_VARARGS, 0 },
 	{0,0,0,0}
 };

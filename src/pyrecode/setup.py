@@ -14,6 +14,6 @@ setup (name = 'PyReCoDe',
        author = 'Abhik Datta',
        author_email = '',
        url = '',
-       long_description = 'This is really just a demo package.',
+       long_description = 'Contains readers and writers for ReCoDe',
        ext_modules = [module1]
     )
