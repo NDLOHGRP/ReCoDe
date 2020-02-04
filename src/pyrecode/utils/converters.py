@@ -108,3 +108,56 @@ def _get_centroids_2D_nb (labelled_image, b_frame, frame):
             centroid_arr[i-1,1] = centroids[label][1] / centroids[label][2]
 
     return centroid_arr
+
+
+
+if __name__== "__main__":
+
+    test_frame = [
+    [0,0,0,0,0,0,0,1,1],
+    [0,1,1,0,0,0,0,0,0],
+    [0,1,1,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0],
+    [1,0,0,1,0,0,0,0,0],
+    [0,1,0,0,1,0,0,0,0],
+    [0,0,1,0,0,0,0,0,0],
+    [0,1,1,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,1,1]]
+
+    test_b_frame = [
+    [0,0,0,0,0,0,0,1,1],
+    [0,1,1,0,0,0,0,0,0],
+    [0,1,1,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0],
+    [1,0,0,1,0,0,0,0,0],
+    [0,1,0,0,1,0,0,0,0],
+    [0,0,1,0,0,0,0,0,0],
+    [0,1,1,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,1,1]]
+
+    labelled_image = [
+    [0,0,0,0,0,0,0,1,1],
+    [0,2,2,0,0,0,0,0,0],
+    [0,2,2,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0],
+    [3,0,0,4,0,0,0,0,0],
+    [0,3,0,0,4,0,0,0,0],
+    [0,0,3,0,0,0,0,0,0],
+    [0,3,3,0,0,0,0,0,5],
+    [3,0,0,0,0,0,0,5,5]]
+
+    c = _get_centroids_2D_nb (
+        np.array(labelled_image, dtype=np.uint16), 
+        np.array(test_b_frame, dtype=np.bool), 
+        np.array(test_frame, dtype=np.uint16)
+    )
+    start = time.time()
+    for i in range(500):
+        c = _get_centroids_2D_nb (
+            np.array(labelled_image, dtype=np.uint16), 
+            np.array(test_b_frame, dtype=np.bool), 
+            np.array(test_frame, dtype=np.uint16)
+        )
+    end = time.time()
+    print("Elapsed (after compilation) = %s" % (end - start))
+    print(c)
