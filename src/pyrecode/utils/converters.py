@@ -9,10 +9,9 @@ from datetime import datetime
 
 '''
 To Do: 
-1. validate _get_centroids_2D
+1. centroiding scheme option for _get_centroids_2D and implementing 'max' centroiding scheme. For 'unweighted' centroiding scheme set frame = b_frame
 2. multithreading support
 3. support for RecodeReader object in addition to dictionary of frames
-Already done: tried numba (doesn't work with np.argwhere)
 '''
 def L1_to_L4 (L1_frames, calibration_frame=None, n_Frames=-1):
 
