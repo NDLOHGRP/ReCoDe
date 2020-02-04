@@ -7,7 +7,6 @@ def _read_data_from_file(init_params, input_params):
     if input_params._source_file_type == 'mrc' or input_params._source_file_type == 'mrcs':
         mrc = mrcfile.open(init_params._source_file_name, mode='r')
         return mrc.header, mrc.data
-    elif
 
     self._init_params._source_file_name, self._input_params._source_file_type, self._input_params._source_bit_depth
     num_bytes = 0

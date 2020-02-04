@@ -14,6 +14,20 @@ void writeToFile (const char *filename, uint8_t *data, int dataLength) {
 	
 }
 
+void writeToFile(const char *filename, char *data, int dataLength) {
+
+	FILE * fp;
+	fp = fopen(filename, "w+");
+
+	int i = 0;
+	for (i = 0; i < dataLength; i++) {
+		fprintf(fp, "%s", data[i]);
+	}
+
+	fclose(fp);
+
+}
+
 
 void serializeFrames (uint16_t *data, uint32_t nx, uint32_t ny, const char* filename, int nFrames) {
 	

@@ -776,7 +776,7 @@ void decompressExpand_L1_Reduced_Compressed_Sparse (FILE* rc_fp, const char *out
 /*
 this function is called by pyrecode_c.py
 */
-uint64_t decompressExpand_L1_Reduced_Compressed_Frame_Sparse(
+int64_t decompressExpand_L1_Reduced_Compressed_Frame_Sparse(
 	FILE* rc_fp, uint16_t nx, uint16_t ny, uint8_t bit_depth, 
 	uint32_t n_compressed_bytes_in_binary_image, uint32_t n_compressed_bytes_in_pixvals, uint32_t n_bytes_in_packed_pixvals, uint32_t n_bytes_in_binary_image,
 	uint8_t *compressedBinaryImage, uint8_t *deCompressedBinaryImage, uint8_t *compressedPixvals, uint8_t *deCompressedPixvals,
@@ -788,11 +788,26 @@ uint64_t decompressExpand_L1_Reduced_Compressed_Frame_Sparse(
 	/*
 	rc_fp is assumed to point to beginning of a frame. Appropriate seek is handled by callers: pyrecode_c.py
 	*/
-
+	size_t t;
+	uint32_t frame_id;
 	if (is_intermediate_file == 1) {
-		fread(&n_compressed_bytes_in_binary_image, sizeof(uint32_t), 1, rc_fp);
-		fread(&n_compressed_bytes_in_pixvals, sizeof(uint32_t), 1, rc_fp);
-		fread(&n_bytes_in_packed_pixvals, sizeof(uint32_t), 1, rc_fp);
+		// skip frame_id, nCompressedSize_BinaryImage, nCompressedSize_Pixvals, bytesRequiredForPacking
+		t = fread(&frame_id, sizeof(uint32_t), 1, rc_fp);
+		if (t != 1) {
+			return -1;
+		}
+		t = fread(&n_compressed_bytes_in_binary_image, sizeof(uint32_t), 1, rc_fp);
+		if (t != 1) {
+			return -1;
+		}
+		t = fread(&n_compressed_bytes_in_pixvals, sizeof(uint32_t), 1, rc_fp);
+		if (t != 1) {
+			return -1;
+		}
+		t = fread(&n_bytes_in_packed_pixvals, sizeof(uint32_t), 1, rc_fp);
+		if (t != 1) {
+			return -1;
+		}
 	}
 
 	/*
@@ -804,8 +819,9 @@ uint64_t decompressExpand_L1_Reduced_Compressed_Frame_Sparse(
 	compressedPixvals = (uint8_t*)calloc(n_bytes_in_image, sizeof(uint8_t));
 	deCompressedPixvals = (uint8_t*)calloc(n_bytes_in_image, sizeof(uint8_t));
 	*/
-
+	
 	/*
+	printf("L1.h: Processing Frame % PRIu32 \n", frame_id);
 	printf("nx = %" PRIu32 "\n", nx);
 	printf("ny = %" PRIu32 "\n", ny);
 	printf("n_compressed_bytes_in_binary_image = %" PRIu32 "\n", n_compressed_bytes_in_binary_image);
@@ -815,20 +831,28 @@ uint64_t decompressExpand_L1_Reduced_Compressed_Frame_Sparse(
 	*/
 
 	size_t result_1 = fread(compressedBinaryImage, sizeof(uint8_t), n_compressed_bytes_in_binary_image, rc_fp);
+	if (result_1 != n_compressed_bytes_in_binary_image) {
+		return -1;
+	}
+	
 	/*
 	printf("L1.h: read %zu\n", result_1);
 	printf("current position (L1.h): %d\n", ftell(rc_fp));
 	*/
+
 	size_t result_2 = fread(compressedPixvals, sizeof(uint8_t), n_compressed_bytes_in_pixvals, rc_fp);
+	if (result_2 != n_compressed_bytes_in_pixvals) {
+		return -1;
+	}
+	
 	/*
 	printf("L1.h: read %zu\n", result_2);
 	printf("current position (L1.h): %d\n", ftell(rc_fp));
-
 	for (int i = 0; i < 10; i++) {
 		printf("compressedBinaryImage[%d] = %" PRIu8 "\n", i, compressedBinaryImage[i]);
 	}
 	*/
-
+	
 	decompress_stream(-1, -1, compressedBinaryImage, deCompressedBinaryImage, n_compressed_bytes_in_binary_image, n_bytes_in_binary_image);
 	decompress_stream(-1, -1, compressedPixvals, deCompressedPixvals, n_compressed_bytes_in_pixvals, n_bytes_in_packed_pixvals);
 
@@ -867,8 +891,9 @@ uint64_t decompressExpand_L1_Reduced_Compressed_Frame_Sparse(
 			}
 		}
 	}
+	
 	printf("Decoded Frame with %" PRIu64 " foreground pixels\n", n_fg_pixels);
-	return n_fg_pixels;
+	return (int64_t)n_fg_pixels;
 }
 
 

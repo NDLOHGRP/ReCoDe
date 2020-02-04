@@ -6,6 +6,7 @@ import zmq
 import queue
 import argparse
 import subprocess
+from pathlib import Path
 
 '''
 #=========Params==========
@@ -50,9 +51,9 @@ path = args.path
 max_count = args.max_count
 chunk_time_in_sec = args.chunk_time_in_sec
 
-_recode_server_exe = 'D:/cbis/GitHub/ReCoDe/win32/x64/Release/OnTheFlyReCoDe'
-# _recode_server_exe = 'D:/StreamPix/Abhik/ReCoDe/win32/x64/Release/OnTheFlyReCoDe'
-command = _recode_server_exe + ' -d ' + args.calibration_file + ' -o ' + args.out_dir + ' -p ' + args.params_file + ' -i ' + args.out_file_name + ' -l ' + args.log_file + ' -v ' + str(args.verbosity) + ' -vf ' + str(args.validation_frame_gap) + ' -n ' + args.run_name
+_recode_server_exe = Path('D:/cbis/GitHub/ReCoDe/win32/x64/Release/OnTheFlyReCoDe')
+# _recode_server_exe = Path('D:/StreamPix/Abhik/ReCoDe/win32/x64/Release/OnTheFlyReCoDe')
+command = _recode_server_exe + ' -d ' + Path(args.calibration_file) + ' -o ' + Path(args.out_dir) + ' -p ' + Path(args.params_file) + ' -i ' + Path(args.out_file_name) + ' -l ' + Path(args.log_file) + ' -v ' + str(args.verbosity) + ' -vf ' + str(args.validation_frame_gap) + ' -n ' + args.run_name
 print(command)
 # os.system("start /wait cmd /c " + command)
 subprocess.Popen(command, creationflags=subprocess.CREATE_NEW_CONSOLE)

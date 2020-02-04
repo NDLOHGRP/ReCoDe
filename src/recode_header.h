@@ -126,18 +126,18 @@ typedef struct {
 	Retained for sanity purposes.
 	*/
 	uint32_t	dark_frame_offset;
-	
-	/*
-	The bit depth used to store pixel intensity values in the original source file. 
-	Retained for sanity purposes as bit depth may change in L1 and L2 and is reduced to 1 in L3 and L4.
-	*/
-	uint8_t		source_bit_depth;
-	
+
 	/*
 	Number of frames used in dark noise data set
 	Retained for sanity purposes.
 	*/
 	uint32_t	num_dark_frames;
+
+	/*
+	The bit depth used to store pixel intensity values in the original source file. 
+	Retained for sanity purposes as bit depth may change in L1 and L2 and is reduced to 1 in L3 and L4.
+	*/
+	uint8_t		source_bit_depth;
 	
 	/*
 	SHA3-256M Hash value of the uncompressed, unreduced (original) data

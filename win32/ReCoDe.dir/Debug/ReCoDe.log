@@ -1,4 +1,6 @@
-﻿  recode.cpp
+﻿  Building Custom Rule D:/cbis/GitHub/ReCoDe/CMakeLists.txt
+  CMake does not need to re-run because D:\cbis\GitHub\ReCoDe\win32\CMakeFiles\generate.stamp is up-to-date.
+  recode.cpp
 D:\cbis\GitHub\ReCoDe\include\win32\dirent.h(1102): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
 D:\cbis\GitHub\ReCoDe\include\win32\dirent.h(1185): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
 d:\cbis\github\recode\src\initparser.h(230): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 1 has type 'int64_t'
@@ -169,8 +171,8 @@ d:\cbis\github\recode\src\L4.h(646): warning C4244: 'initializing': conversion f
 D:\cbis\GitHub\ReCoDe\src\recode.cpp(361): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
 D:\cbis\GitHub\ReCoDe\src\recode.cpp(402): warning C4244: 'initializing': conversion from 'uint64_t' to 'unsigned long', possible loss of data
 D:\cbis\GitHub\ReCoDe\src\recode.cpp(385): warning C4101: 'nz': unreferenced local variable
-d:\cbis\github\recode\src\initparser.h(376): warning C4715: 'parse_init_params': not all control paths return a value
 d:\cbis\github\recode\src\initparser.h(231): warning C4715: 'parse_recode_server_init_params': not all control paths return a value
+d:\cbis\github\recode\src\initparser.h(376): warning C4715: 'parse_init_params': not all control paths return a value
 d:\cbis\github\recode\src\commons.h(202): warning C4715: 'loadData': not all control paths return a value
 d:\cbis\github\recode\src\argparser.h(189): warning C4715: 'validate_input_params': not all control paths return a value
 d:\cbis\github\recode\src\l4.h(573): warning C4700: uninitialized local variable 'offset' used

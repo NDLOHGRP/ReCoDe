@@ -1,16 +1,13 @@
-/*#include <pyrecode_include.h>*/
-#include <python.h>
+#include <Python.h>
 #include "structmember.h"
 
 #ifndef ENABLE_MULTIPLE_COMPRESSIONS
 #define ENABLE_MULTIPLE_COMPRESSIONS 0
 #endif
 
-
 #define __STDC_FORMAT_MACROS
 #include <inttypes.h>
 
-#include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -36,21 +33,13 @@
 #endif
 
 #include "recodefs.h"
-#include "recode_utils.h"
-#include "mrchandler.h"
-#include "sequence_reader.h"
-#include "commons.h"
 #include "compressor.h"
-#include "logger.h"
-#include "fileutils.h"
-#include "argparser.h"
-#include "recode_header.h"
 
 /*
 #include "ReCoDeConfig.h"
 */
 
-#include "L1.h"
+#include "reader.h"
 
 typedef struct {
 	PyObject_HEAD
@@ -257,23 +246,27 @@ _get_frame_sparse_L1 (RecodeReader *self, PyObject* args) {
 	uint32_t n_compressed_bytes_in_pixvals;
 	uint32_t n_bytes_in_packed_pixvals;
 	uint8_t is_intermediate;
+	uint8_t get_frame_id;
 
-	if (!PyArg_ParseTuple(args, "IIIby*", &n_compressed_bytes_in_binary_image, &n_compressed_bytes_in_pixvals, &n_bytes_in_packed_pixvals, &is_intermediate, &view_frameData)) {
+	if (!PyArg_ParseTuple(args, "IIIbby*", &n_compressed_bytes_in_binary_image, &n_compressed_bytes_in_pixvals, &n_bytes_in_packed_pixvals, &is_intermediate, &get_frame_id, &view_frameData)) {
 		return Py_BuildValue("s", "Unable to parse argument frame_index");
 		return Py_BuildValue("k", 0);
 	}
-	//printf("%d, %d, %d\n", n_compressed_bytes_in_binary_image, n_compressed_bytes_in_pixvals, n_bytes_in_packed_pixvals);
-
-	//printf("current position (pyrecode.cpp): %d\n", ftell(self->file));
-	uint64_t n = decompressExpand_L1_Reduced_Compressed_Frame_Sparse (
+	/*
+	printf("%d, %d, %d\n", n_compressed_bytes_in_binary_image, n_compressed_bytes_in_pixvals, n_bytes_in_packed_pixvals);
+	printf("current position (pyrecode.cpp): %d\n", ftell(self->file));
+	*/
+	int64_t n = decompressExpand_L1_Reduced_Compressed_Frame_Sparse (
 		self->file, self->nx, self->ny, self->bit_depth, 
 		n_compressed_bytes_in_binary_image, n_compressed_bytes_in_pixvals, n_bytes_in_packed_pixvals, self->n_bytes_in_binary_image, 
 		self->compressedBinaryImage, self->deCompressedBinaryImage, self->compressedPixvals, self->deCompressedPixvals,
 		self->pow2_lookup_table,
 		(uint16_t *)(&view_frameData)->buf,
-		is_intermediate
+		is_intermediate,
+		get_frame_id
 	);
-	return Py_BuildValue("K", n);
+	//printf("Decoded Frame with %d foreground pixels\n", n);
+	return Py_BuildValue("L", n);
 }
 
 
@@ -289,9 +282,9 @@ PyMethodDef ReCoDeMethods[] =
 	{0,0,0,0}
 };
 
-static struct PyModuleDef PyReCoDe = {
+static struct PyModuleDef c_recode = {
 	PyModuleDef_HEAD_INIT,
-	"PyReCoDe",   /* name of module */
+	"c_recode",   /* name of module */
 	"Interface to C ReCoDe Reader", /* module documentation, may be NULL */
 	-1,       /* size of per-interpreter state of the module,
 			  or -1 if the module keeps state in global variables. */
@@ -300,7 +293,7 @@ static struct PyModuleDef PyReCoDe = {
 
 static PyTypeObject ReCoDeReaderType = {
 	PyVarObject_HEAD_INIT(NULL, 0)
-	"PyReCoDe.Reader",                            /*tp_name*/
+	"c_recode.Reader",                            /*tp_name*/
 	sizeof(RecodeReader),                          		/*tp_basicsize*/
 	0,											/*tp_itemsize*/
 	(destructor)ReCoDe_dealloc,						/*tp_dealloc*/
@@ -341,16 +334,16 @@ static PyTypeObject ReCoDeReaderType = {
 
 
 PyMODINIT_FUNC
-PyInit_PyReCoDe(void)
+PyInit_c_recode(void)
 {
-	//return PyModule_Create(&PyReCoDe);
+	//return PyModule_Create(&c_recode);
 	
 	PyObject *m;
 	if (PyType_Ready(&ReCoDeReaderType) < 0) {
 		return NULL;
 	}
 
-	m = PyModule_Create(&PyReCoDe);
+	m = PyModule_Create(&c_recode);
 	if (m == NULL) {
 		return NULL;
 	}
