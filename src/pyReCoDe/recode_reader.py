@@ -141,7 +141,7 @@ class ReCoDeReader():
         return {z: sparse_d}
 
     def _make_coo_frame(self, frame_data, N):
-        d = np.asarray(frame_data, dtype=np.uint16)
+        d = np.array(frame_data, dtype=np.uint16)
         d = np.transpose(np.reshape(d[:N*3], [N, 3]))
         sparse_d = coo_matrix((d[2], (d[0],d[1])), shape=(self._header['ny'], self._header['nx']), dtype=np.uint16)
         return sparse_d
