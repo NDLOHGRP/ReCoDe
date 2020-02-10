@@ -118,8 +118,23 @@ int64_t decompressExpand_L1_Reduced_Compressed_Frame_Sparse(
 				frameBuffer[n_fg_pixels * 3] = row;
 				frameBuffer[n_fg_pixels * 3 + 1] = col;
 				frameBuffer[n_fg_pixels * 3 + 2] = extracted_pixval;
-				//printf("Row = %" PRIu16 ", Col = %" PRIu16 ", Value = %" PRIu16 ", foreground pixel = %" PRIu64 "\n", row, col, extracted_pixval, n_fg_pixels);
-				//printf("Row = %d, Col = %d, Value = %d, foreground pixel = %d\n", row, col, extracted_pixval, n_fg_pixels);
+
+				/*==============DEBUG ONLY===============
+				if (row == 2830 && col == 3173) {
+					//printf("Row = %" PRIu16 ", Col = %" PRIu16 ", Value = %" PRIu16 ", foreground pixel = %" PRIu64 "\n", row, col, extracted_pixval, n_fg_pixels);
+					printf("Row = %d, Col = %d, Value = %d, foreground pixel = %d\n", row, col, extracted_pixval, n_fg_pixels);
+					for (n = 0; n < bit_depth; n++) {
+						pixel_bit_index_frame = n_fg_pixels*bit_depth + n;
+						if (CheckBit(deCompressedPixvals, pixel_bit_index_frame) > 0) {
+							printf("1 ");
+						} else {
+							printf("0 ");
+						}
+						printf("\n");
+					}
+				}
+				==============DEBUG ONLY===============*/
+
 				n_fg_pixels++;
 			}
 		}
