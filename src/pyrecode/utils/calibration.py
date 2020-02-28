@@ -6,6 +6,7 @@ import argparse
 import scipy.ndimage as nd
 from skimage.measure import regionprops
 from datetime import datetime
+import pathlib
 
 def _save_file(arr, filename):
     arr.astype('uint16').tofile(filename)
@@ -34,7 +35,7 @@ def make_calibration_frames (filepath, nFrames, n_stats_frames, n_sigmas, savepa
     n_pixels_in_frame = d[0].shape[0]*d[0].shape[1]    
     for i in range(n_sigmas):
         t = np.floor(_m + _std*i).astype(np.uint16)
-        _save_file(t, os.path.join(savepath, filename_prefix + "dark_ref_" + str(i) + ".bin"))
+        _save_file(t, os.path.join(savepath, filename_prefix + "_dark_ref_" + str(i) + ".bin"))
         n_events = 0
         p_foreground_pixels = 0
         for f in range(nFrames-n_stats_frames, nFrames):
@@ -58,5 +59,5 @@ if __name__== "__main__":
     parser.add_argument('--savepath', dest='savepath', action='store', default='', help='path to folder where calibration frames are to be stored')
     parser.add_argument('--save_prefix', dest='filename_prefix', action='store', default='', help='prefix for calibration filename')
     args = parser.parse_args()
-    make_calibration_frames (args.filepath, args.n_frames, args.n_stats_frames, args.n_sigmas, args.savepath, args.filename_prefix)
+    make_calibration_frames (str(pathlib.Path(args.filepath)), args.n_frames, args.n_stats_frames, args.n_sigmas, str(pathlib.Path(args.savepath)), args.filename_prefix)
     
