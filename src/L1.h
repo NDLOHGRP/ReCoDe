@@ -60,7 +60,7 @@ float binarize_and_get_pixvals (uint8_t	 process_id,
 		}
 	}
 	
-	//recode_print("RCT %d: No. of foreground pixels = %lu\n", process_id, *n_fg_pixels);
+	recode_print("RCT %d: No. of foreground pixels = %lu\n", process_id, *n_fg_pixels);
 
 	clock_t p_end = clock();
 	float process_time = (p_end - p_start) * 1000.0 / CLOCKS_PER_SEC;
@@ -309,7 +309,8 @@ void reduceCompressFrame_L1 (	uint8_t	 process_id,
 		}
 		
 
-		//recode_print ("RCT %d: Frame ID = %lu, n_bytes_in_packed_pixvals = %lu\n", process_id, frame_id, *n_bytes_in_packed_pixvals);
+		recode_print ("RCT %d: Frame ID = %lu, n_bytes_in_packed_pixvals = %lu\n", process_id, frame_id, *n_bytes_in_packed_pixvals);
+		recode_print ("RCT %d: Frame ID = %lu, _n_compressed_binary_frame = %lu, _n_compressed_packed_pixel_intensities = %lu\n", process_id, frame_id, *n_compressed_bytes_1, *n_compressed_bytes_2);
 
 		run_metrics[0] += reduction_time;
 		run_metrics[1] += compression_time;
@@ -402,9 +403,17 @@ char* reduceCompress_L1 (uint8_t	 process_id,
 			n_compressed_bytes_1		= 0;
 			n_compressed_bytes_2		= 0;
 			
+			/*
+			mixed up input_params->source_bit_depth and input_params->bit_depth, so hard-coding below
 			reduceCompressFrame_L1 (process_id, frameBuffer, darkFrame, frame_id, z, h, input_params->rc_operation_mode, input_params->dark_threshold_epsilon,
-									input_params->bit_depth, input_params->compression_scheme, input_params->compression_level, 
+									input_params->source_bit_depth, input_params->compression_scheme, input_params->compression_level, 
 									pixvals, binaryImage, packedPixvals, compressedBinaryImage, compressedPackedPixvals, 
+									&n_bytes_in_packed_pixvals, &n_compressed_bytes_1, &n_compressed_bytes_2, compression_time,
+									0, NULL, NULL);
+			*/
+			reduceCompressFrame_L1(process_id, frameBuffer, darkFrame, frame_id, z, h, input_params->rc_operation_mode, input_params->dark_threshold_epsilon,
+									12, input_params->compression_scheme, input_params->compression_level,
+									pixvals, binaryImage, packedPixvals, compressedBinaryImage, compressedPackedPixvals,
 									&n_bytes_in_packed_pixvals, &n_compressed_bytes_1, &n_compressed_bytes_2, compression_time,
 									0, NULL, NULL);
 			//printf("RCT %d: 2.\n", process_id);
@@ -425,6 +434,13 @@ char* reduceCompress_L1 (uint8_t	 process_id,
 				fwrite (compressedPackedPixvals , 	sizeof(uint8_t),  n_compressed_bytes_2, fp);
 			
 			}
+
+			/*======Testing=======*/
+			for (int i = 0; i < 10; i++) {
+				printf("%d packed_pixel_intensities = %" PRIu8 "  pixel_intensities = %" PRIu16 "\n", i, packedPixvals[i], pixvals[i]);
+			}
+			/*====================*/
+
 		}
 
 		// serialize the number of frames at the end
@@ -548,7 +564,8 @@ char* merge_RC1_Parts (	const char   *folderpath,
 
 	// copy actual data
 	uint32_t partfile_num;
-	uint32_t n_bytes_in_image = ceil(input_params->num_rows * input_params->num_cols * input_params->bit_depth / 8.0);
+	//uint32_t n_bytes_in_image = ceil(input_params->num_rows * input_params->num_cols * input_params->source_bit_depth / 8.0);
+	uint32_t n_bytes_in_image = ceil(input_params->num_rows * input_params->num_cols * 12 / 8.0);
 	uint32_t n_bytes_in_binary_image = ceil(input_params->num_rows * input_params->num_cols / 8.0);
 	uint8_t *compressedBinaryImage = (uint8_t*)calloc(n_bytes_in_binary_image, sizeof(uint8_t));
 	uint8_t *compressedPixvals = (uint8_t*)calloc(n_bytes_in_image, sizeof(uint8_t));

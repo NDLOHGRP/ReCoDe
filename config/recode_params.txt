@@ -13,10 +13,7 @@ RC_Operation_Mode = 1
 
 # For the (ij)th pixel the threshold used for dark subtraction is estimated as:
 # the maximum value of the (ij)th pixel across the z frames of the dark noise dataset + Dark_Threshold_Epsilon
-Dark_Threshold_Epsilon = 20
-
-# The bit depth used to store pixel intensity values. Only used for L1 and L2.
-Bit_Depth = 12
+Dark_Threshold_Epsilon = 0
 
 # The bit depth of pixel intensity values in the source file.
 # If source file is MRC and the user provided value is -1, the bit depth as per MRC header is used
@@ -26,14 +23,14 @@ Source_Bit_Depth = 12
 
 # Frame dimensions
 # If source file is MRC, these parameters are read from MRC header, else user provided values are used
-Num_Cols = 4096
-Num_Rows = 512
+Num_Cols = 1024
+Num_Rows = 1024
 
 # Number of frames to extract from dataset i
 # If source file is MRC and the user provided value is -1, the number of frames as per MRC header is used
 # If source file is MRC and the user provided value is not -1, the user specified number of frames are read
 # If source file is not MRC this value has to be explicitly provided
-Num_Frames = 2000
+Num_Frames = 100
 
 # Number of frames to skip in the original data set
 Frame_Offset = 0
@@ -54,7 +51,7 @@ Dark_Frame_Offset = 0
 Keep_Part_Files = 0
 
 # The number of OMP threads used. Num_Threads = 1 implies no parallelism.
-Num_Threads = 2
+Num_Threads = 1
 
 # The statistic to be stored for L2
 # 0 = None, 1 = Max, 2 = Mean
@@ -81,7 +78,7 @@ Compression_Level = 1
 Source_File_Type = 2
 
 # input file's header size in bytes 
-# used only if source_file_type is 0 or 2
+# used only if source_file_type is 0 or 3
 # if source_file_type = 1 (i.e MRC file) this input is ignored and header size is automatically set to 1024 bytes
 Source_Header_Length = 0
 
@@ -93,3 +90,25 @@ Keep_Dark_Data = 1
 # the parameter is used to decide the position and size of the original file's header
 # source_file_type = 1 (i.e MRC file), original file's header is pre-fixed to RC header, else original file's header is post-fixed to end of compressed RC data
 Dark_File_Type = 0
+
+# ==================== New Params ==================
+# dark file's header size in bytes 
+# used only if dark_file_type is 0 or 3
+# if source_file_type = 1 (i.e MRC file) this input is ignored and header size is automatically set to 1024 bytes
+Dark_Header_Length = 0
+
+# data type for source (the appropriate numpy data type is decided based on this parameter and Source_Bit_Depth)
+# 0 = unsigned int, 1 = signed int, 2 = float
+Source_Data_Type = 0
+
+# data type for target
+# 0 = unsigned int, 1 = signed int, 2 = float
+Target_Data_Type = 0
+
+# The source bit depth used to store pixel intensity values. Only used for L1 and L2.
+# The bit_depth param was renamed to Source_Bit_Depth and replaces it
+Source_Bit_Depth = 12
+
+# The target bit depth used to store pixel intensity values. Only used for L1 and L2.
+# The bit_depth param was renamed to Target_Bit_Depth and replaces it
+Target_Bit_Depth = 12

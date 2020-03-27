@@ -142,3 +142,51 @@ int64_t decompressExpand_L1_Reduced_Compressed_Frame_Sparse(
 	//printf("Decoded Frame with %d foreground pixels\n", n_fg_pixels);
 	return (int64_t)n_fg_pixels;
 }
+
+/*
+These function are provided for testing purposes only. No external pythonic calls to these function are available. 
+Decompression to only sparse format is supported for external calls.
+void decompressExpand_L1_Reduced_Only(FILE* fp, const char *out_fname, RCHeader *header) {}
+void decompressExpand_L1_Reduced_Only_Sparse(FILE* fp, const char *out_fname, RCHeader *header) {}
+*/
+
+
+/*
+Called by the python function _bit_pack_pixel_intensities
+a similar function with scaling is declared above: scale_and_pack_pixvals
+*/
+float bit_pack_pixel_intensities (
+						uint64_t sz_packedPixval, 
+						uint32_t n_fg_pixels,
+						uint8_t  bit_depth, 
+						uint16_t *pixvals, 
+						uint8_t  *packedPixvals) {
+	
+	clock_t p_start = clock();
+
+	int p, n, linear_index, nth_bit_of_pth_pixval;
+	
+	// setting packedPixvals to 0 in a for loop is faster than using ClearBit
+	for (p = 0; p < sz_packedPixval; p++) {
+		packedPixvals[p] = 0;
+	}
+	
+	for (p=0; p<n_fg_pixels; p++) {
+		
+		// Assumes LITTLE-ENDIAN Byte Order
+		for (n=0; n<bit_depth; n++) {
+			nth_bit_of_pth_pixval = (pixvals[p] & ( 1 << n )) >> n;
+			if (nth_bit_of_pth_pixval != 0) {
+				linear_index = p*bit_depth + n;
+				SetBit(packedPixvals, linear_index);
+			}
+		}
+		
+		//printf("%f, %hu, %hu, %hu, %hu\n", pixval_01, scaled_pixval, pixvals[p], data_min, data_max);
+	}
+	
+	clock_t p_end = clock();
+	float process_time = (p_end - p_start) * 1000.0 / CLOCKS_PER_SEC;
+	return process_time;
+	
+}

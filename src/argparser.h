@@ -29,9 +29,9 @@ void get_input_params (const char* argfilename, InputParams **params) {
 					
 					(*params)->dark_threshold_epsilon = (unsigned short)value;
 					
-				} else if (strcmp(name, "bit_depth") == 0) {
+				} else if (strcmp(name, "target_bit_depth") == 0) {
 					
-					(*params)->bit_depth = (unsigned char)value;
+					(*params)->target_bit_depth = (unsigned char)value;
 					
 				} else if (strcmp(name, "source_bit_depth") == 0) {
 					
@@ -122,7 +122,7 @@ void get_input_params (const char* argfilename, InputParams **params) {
 		(*params)->reduction_level 			= 1;
 		(*params)->rc_operation_mode 		= 1;
 		(*params)->dark_threshold_epsilon	= 0;
-		(*params)->bit_depth 				= 12;
+		(*params)->target_bit_depth 		= 12;
 		(*params)->source_bit_depth 		= 12;
 		(*params)->num_cols 				= 4096;
 		(*params)->num_rows 				= 4096;

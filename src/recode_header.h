@@ -167,7 +167,7 @@ void create_recode_header (InputParams *input_params, uint8_t id, const char *so
 	
 	(*header)->reduction_level 			= input_params->reduction_level;
 	(*header)->recode_operation_mode    = input_params->rc_operation_mode;
-	(*header)->bit_depth 				= input_params->bit_depth;
+	(*header)->bit_depth 				= input_params->target_bit_depth;
 	(*header)->nx						= input_params->num_cols;
 	(*header)->ny						= input_params->num_rows;
 	(*header)->nz						= input_params->num_frames;

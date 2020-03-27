@@ -66,7 +66,7 @@ typedef struct {
 	target bit depth after reduction
 	if not provided, same as source_bit_depth
 	*/
-	unsigned char	bit_depth;
+	unsigned char	target_bit_depth;
 
 	/*
 	The bit depth of pixel intensity values in the source file.

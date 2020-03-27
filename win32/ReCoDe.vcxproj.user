@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LocalDebuggerCommandArguments>-merge -i "D:\cbis\images\30-Aug-2019\400fps_dose_43\400fps_dose_43.rc1_part000" -o "D:\cbis\images\30-Aug-2019\400fps_dose_43" -p "D:\cbis\GitHub\ReCoDe\config\recode_params.txt" -n 400fps_dose_43</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-rc -i "Z:\28-Feb-2020\DE16\15-55-17.854.seq" -d "Z:\28-Feb-2020\DE16\_dark_ref_3.bin" -o "D:\cbis\GitHub\ReCoDe\scratch" -p "D:\cbis\GitHub\ReCoDe\config\recode_params.txt" -n 15-55-17.854</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerCommandArguments>-de -i "D:/cbis/GitHub/ReCoDe/scratch/400fps_dose_43.rc1" -o "D:/cbis/GitHub/ReCoDe/scratch/"</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-rc -i "Z:\28-Feb-2020\DE16\15-55-17.854.seq" -d "Z:\28-Feb-2020\DE16\_dark_ref_3.bin" -o "D:\cbis\GitHub\ReCoDe\scratch" -p "D:\cbis\GitHub\ReCoDe\config\recode_params.txt" -n 15-55-17.854 -v 1</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">

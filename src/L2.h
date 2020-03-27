@@ -373,7 +373,7 @@ char* reduceCompress_L2 (uint8_t	 process_id,
 			n_compressed_bytes_summary_stats	= 0;
 			
 			reduceCompressFrame_L2 (process_id, frameBuffer, darkFrame, frame_id, z, h, 
-									input_params->rc_operation_mode, input_params->dark_threshold_epsilon, input_params->bit_depth,
+									input_params->rc_operation_mode, input_params->dark_threshold_epsilon, input_params->source_bit_depth,
 									input_params->compression_scheme, input_params->compression_level, 
 									x_coor, y_coor, foregroundImage, centroidImage, eventSummaryStats,
 									foregroundTernaryMap, compressedCentroidImage, packedSummaryStats, compressedSummaryStats,
