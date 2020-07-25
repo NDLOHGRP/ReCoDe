@@ -12,9 +12,9 @@ def emfile (file, file_type=None, mode="r", buffering=-1):
         
         try:
             if (source_type == rc.FILE_TYPE_MRC):
-                reader = MRCReader(file, source_type)
+                reader = MRCReader(file)
             elif (source_type == rc.FILE_TYPE_SEQ):
-                reader = SEQReader(file, source_type)
+                reader = SEQReader(file)
             elif (source_type == rc.FILE_TYPE_BINARY):
                 raise NotImplementedError
             else:
@@ -216,7 +216,7 @@ class MRCReader(EMReaderBase):
             container = self._stack[np.newaxis,slice_y,slice_x]
         else:
             raise NotImplementedError
-        return io.emcreate(container)
+        return container
 
     def _get_frame(self, z_index):
         if self._file_handle.is_single_image():
@@ -225,7 +225,7 @@ class MRCReader(EMReaderBase):
             container = self._stack[z_index][np.newaxis,:,:]
         else:
             raise NotImplementedError
-        return io.emcreate(container)
+        return container
 
     def close(self):
         self._file_handle.close()

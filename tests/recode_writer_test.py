@@ -29,7 +29,7 @@ if __name__== "__main__":
 
     writer = ReCoDeWriter (
         args.image_filename, 
-        args.calibration_file, 
+        dark_filename=args.calibration_file, 
         output_directory=args.out_dir, 
         input_params=None, 
         params_filename=args.params_file, 

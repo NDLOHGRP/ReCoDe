@@ -12,19 +12,25 @@ from datetime import datetime
 import time
 import argparse
 import math
-import zlib
-import blosc
 from numba import jit
 import c_recode
 import warnings
 import scipy.ndimage as nd
 from skimage.measure import regionprops
 
+import zlib
+import blosc
+import zstandard as zstd
+import snappy
+import lz4.frame
+import lzma
+import bz2
+
 class ReCoDeWriter():
 
     def __init__(self, 
-        image_filename, dark_filename, output_directory='',
-        input_params=None, params_filename='', mode='batch', 
+        image_filename, dark_data=None, dark_filename='', 
+        output_directory='', input_params=None, params_filename='', mode='batch', 
         validation_frame_gap=-1, log_filename='recode.log', run_name='run', 
         verbosity=0, use_C=False, max_count=-1, chunk_time_in_sec=0, node_id=0):
         """
@@ -34,12 +40,16 @@ class ReCoDeWriter():
         ----------
         image_filename : string
             file to be processed
+        dark_data : numpy array
+            calibration_data (required if dark_filename is None), 
+            if both dark_data and dark_filename are given, dark_data will be used and dark_filename will be ignored
         dark_filename : string
-            file containing calibration data (required ir mode is 'rc')
+            file containing calibration data (required if dark_data is None)
         output_directory : string
             location where processed data will be written to
         input_params : InputParams or dict
-            object of type pyrecode.params.InputParams or a dictionary containing input parameters (required if params_file is None)
+            object of type pyrecode.params.InputParams or a dictionary containing input parameters (required if params_file is None),
+            if both input_params and params_filename are given, input_params will be used and params_filename will be ignored
         params_filename : string
             file containing input parameters (required if input_params is None)
         mode: string
@@ -91,14 +101,17 @@ class ReCoDeWriter():
             raise ValueError('Invalid ReCoDe header created')
 
         # load and validate calibration frame
-        if self._input_params.dark_file_type == rc.FILE_TYPE_MRC:
-            t = MRCReader(str(self._init_params.dark_filename))
-        elif self._input_params.dark_file_type == rc.FILE_TYPE_SEQ:
-            t = SEQReader(str(self._init_params.dark_filename))
-        elif self._input_params.dark_file_type == rc.FILE_TYPE_BINARY:
-            t = read_file(str(self._init_params.dark_filename), self._header._rc_header['ny'], self._header._rc_header['nx'], self._input_params.source_dtype)
+        if dark_data is None:
+            if self._input_params.dark_file_type == rc.FILE_TYPE_MRC:
+                t = MRCReader(str(self._init_params.dark_filename))
+            elif self._input_params.dark_file_type == rc.FILE_TYPE_SEQ:
+                t = SEQReader(str(self._init_params.dark_filename))
+            elif self._input_params.dark_file_type == rc.FILE_TYPE_BINARY:
+                t = read_file(str(self._init_params.dark_filename), self._header._rc_header['ny'], self._header._rc_header['nx'], self._input_params.source_dtype)
+            else:
+                raise NotImplementedError("No implementation available for loading calibration file of type 'Other'")
         else:
-            raise NotImplementedError("No implementation available for loading calibration file of type 'Other'")
+            t = dark_data
         
         if self._header._rc_header['ny'] != t.shape[0] or self._header._rc_header['nx'] != t.shape[1]:
             raise RuntimeError('Data and Calibration frames have different shapes')
@@ -156,8 +169,9 @@ class ReCoDeWriter():
         # self._source.serialize_header(str(self._intermediate_file_name))
 
         # create validation file
-        self._validation_file_name = os.path.join(self._init_params._output_directory, base_filename + '_part' + '{0:03d}'.format(self._node_id))
-        self._validation_file = open(self._validation_file_name, 'wb')
+        if self._init_params.validation_frame_gap > 0:
+            self._validation_file_name = os.path.join(self._init_params._output_directory, base_filename + '_part' + '{0:03d}'.format(self._node_id) + '_validation_frames.bin')
+            self._validation_file = open(self._validation_file_name, 'wb')
 
         # create buffer to hold reduced_compressed data
         self._buffer_sz = 1000            # best to ensure buffer size is large enough to hold the expected amount of data to be processed by this thread for a single chunk
@@ -188,26 +202,34 @@ class ReCoDeWriter():
         self._vc_roi['y_start'] = math.floor((self._header._rc_header['ny'] - self._vc_roi['ny']) / 2.0)
         self._vc_n_pixels = self._vc_roi['nx']*self._vc_roi['ny']
 
-    def _do_sanity_checks(self):
+        if self._input_params.compression_scheme == 1:      #zstd
+            self._compressor_context = zstd.ZstdCompressor(level=self._input_params.compression_level, write_content_size=False)
+
+    def _do_sanity_checks(self, data=None):
         '''
         Source data is now available. Validate if input params agree with data. 
         This function is called separately for each chunk by each thread.
         Load source header here.
         '''
         # get source file headers
-        if self._input_params.source_file_type == rc.FILE_TYPE_MRC:
-            self._source = MRCReader(str(self._init_params.image_filename))
-            self._source_shape = self._source.shape
+        if data is None:
+            if self._input_params.source_file_type == rc.FILE_TYPE_MRC:
+                self._source = MRCReader(str(self._init_params.image_filename))
+                self._source_shape = self._source.shape
 
-        elif self._input_params.source_file_type == rc.FILE_TYPE_SEQ:
-            self._source = SEQReader(str(self._init_params.image_filename))
-            self._source_shape = self._source.shape
+            elif self._input_params.source_file_type == rc.FILE_TYPE_SEQ:
+                self._source = SEQReader(str(self._init_params.image_filename))
+                self._source_shape = self._source.shape
 
-        elif self._input_params.source_file_type == rc.FILE_TYPE_BINARY:
-            self._source_shape = tuple([self._header._rc_header['nz'], self._header._rc_header['ny'], self._header._rc_header['nx']])
+            elif self._input_params.source_file_type == rc.FILE_TYPE_BINARY:
+                self._source_shape = tuple([self._header._rc_header['nz'], self._header._rc_header['ny'], self._header._rc_header['nx']])
 
+            else:
+                raise NotImplementedError("No implementation available for loading calibration file of type 'Other'")
         else:
-            raise NotImplementedError("No implementation available for loading calibration file of type 'Other'")
+            self._source = data
+            self._source_shape = self._source.shape
+        
 
         # Validate that user given header values agree with source (MRC or SEQ) Header values of source file
         if self._source_shape[1] != self._header._rc_header['ny']:
@@ -228,7 +250,7 @@ class ReCoDeWriter():
         if self._input_params.dark_file_type in [rc.FILE_TYPE_MRC, rc.FILE_TYPE_SEQ]:
             self._source.close()
 
-    def run(self):
+    def run(self, data=None):
         '''
         Source data is now available. This function is called separately for each chunk by each thread.
         Each thread will independently read and process data
@@ -236,7 +258,7 @@ class ReCoDeWriter():
         run_metrics = {}
 
         # do sanity checks
-        self._do_sanity_checks()
+        self._do_sanity_checks(data)
 
         # determine the number of available frames for this thread
         if self._init_params.mode == 'batch':
@@ -251,8 +273,9 @@ class ReCoDeWriter():
 
         # read the thread-specific data from chunk into memory
         stt=datetime.now()
-        with emfile(str(self._init_params.image_filename), self._input_params.source_file_type, mode="r") as f:
-            data = f[frame_offset:frame_offset+available_frames]
+        if data is None:
+            with emfile(str(self._init_params.image_filename), self._input_params.source_file_type, mode="r") as f:
+                data = f[frame_offset:frame_offset+available_frames]
         if data.dtype != self._src_dtype:
             warnings.warn('Source data type not as specified. Attempting to cast.')
             data = data.astype(self._src_dtype)
@@ -356,10 +379,12 @@ class ReCoDeWriter():
 
             # compress
             stt=datetime.now()
-            compressed_binary_frame = zlib.compress(packed_binary_frame, self._input_params.compression_level)
+            #  compressed_binary_frame = zlib.compress(packed_binary_frame, self._input_params.compression_level)
+            compressed_binary_frame = self._compress(packed_binary_frame)
             run_metrics['frame_binary_image_compression_time'] = datetime.now()-stt
             stt=datetime.now()
-            compressed_packed_pixel_intensities = zlib.compress(packed_pixel_intensities, self._input_params.compression_level)
+            # compressed_packed_pixel_intensities = zlib.compress(packed_pixel_intensities, self._input_params.compression_level)
+            compressed_packed_pixel_intensities = self._compress(packed_pixel_intensities)
             run_metrics['frame_pixel_intensity_compression_time'] = datetime.now()-stt
 
             # get compresed sizes
@@ -382,9 +407,10 @@ class ReCoDeWriter():
                   '_n_compressed_binary_frame', _n_compressed_binary_frame, 
                   '_n_compressed_packed_pixel_intensities', _n_compressed_packed_pixel_intensities)
 
+            '''
             for i in range(10):
                 print(i, 'packed_pixel_intensities', packed_pixel_intensities[i], 'pixel_intensities', pixel_intensities[i])
-
+            '''
         else:
             raise ValueError('Unknown RC Operation Mode')
 
@@ -418,13 +444,54 @@ class ReCoDeWriter():
         self._intermediate_file.close()
 
         # close validation file
-        self._validation_file.close()
+        if self._init_params.validation_frame_gap > 0:
+            self._validation_file.close()
 
 
     def _offload_buffer(self):
         self._intermediate_file.write(self._rct_buffer[:self._rct_buffer_fill_position])
         self._intermediate_file.flush()
 
+    def _compress(self, packed_binary_frame):
+
+        if self._input_params.compression_scheme == 0:        #zlib
+            return zlib.compress(packed_binary_frame, self._input_params.compression_level)
+
+        elif self._input_params.compression_scheme == 1:      #zstd
+            return self._compressor_context.compress(packed_binary_frame)
+
+        elif self._input_params.compression_scheme == 2:      #lz4
+            return lz4.frame.compress(packed_binary_frame, compression_level=self._input_params.compression_level, store_size=False)
+
+        elif self._input_params.compression_scheme == 3:      #snappy
+            return snappy.compress(packed_binary_frame)
+
+        elif self._input_params.compression_scheme == 4:      #bzip
+            return bz2.compress(packed_binary_frame, compresslevel=self._input_params.compression_level)
+
+        elif self._input_params.compression_scheme == 5:      #lzma
+            return lzma.compress(packed_binary_frame, preset=self._input_params.compression_level)
+
+        elif self._input_params.compression_scheme == 6:      #blosc_zlib
+            return blosc.compress(packed_binary_frame, clevel=self._input_params.compression_level, cname='zlib', shuffle=blosc.BITSHUFFLE)
+
+        elif self._input_params.compression_scheme == 7:      #blosc_zstd
+            return blosc.compress(packed_binary_frame, clevel=self._input_params.compression_level, cname='zstd', shuffle=blosc.BITSHUFFLE)
+
+        elif self._input_params.compression_scheme == 8:      #blosc_lz4
+            return blosc.compress(packed_binary_frame, clevel=self._input_params.compression_level, cname='lz4', shuffle=blosc.BITSHUFFLE)
+
+        elif self._input_params.compression_scheme == 9:      #blosc_snappy
+            return blosc.compress(packed_binary_frame, clevel=self._input_params.compression_level, cname='snappy', shuffle=blosc.BITSHUFFLE)
+
+        elif self._input_params.compression_scheme == 10:      #blosclz
+            return blosc.compress(packed_binary_frame, clevel=self._input_params.compression_level, cname='blosclz', shuffle=blosc.BITSHUFFLE)
+
+        elif self._input_params.compression_scheme == 11:      #blosc_lz4hc
+            return blosc.compress(packed_binary_frame, clevel=self._input_params.compression_level, cname='lz4hc', shuffle=blosc.BITSHUFFLE)
+
+        else:
+            raise NotImplementedError('compression scheme not implemented')
 
 def print_run_metrics(run_metrics):
     for key in run_metrics:

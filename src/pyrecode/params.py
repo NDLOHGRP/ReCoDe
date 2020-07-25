@@ -314,12 +314,12 @@ class InputParams():
             print ('L4 centroiding must be 0, 1, 2 or 3')
             return False
 
-        if self._param_map['compression_scheme'] not in [0,1,2,3,4]:
-            print ('Compression scheme must be 0, 1, 2, 3 or 4')
+        if self._param_map['compression_scheme'] not in [0,1,2,3,4,5,6,7,8,9,10,11]:
+            print ('Compression scheme must be 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 or 11')
             return False
 
-        if int(self._param_map['compression_level']) < 1 or int(self._param_map['compression_level']) > 9:
-            print ('Compression level can be from 1 - 9')
+        if int(self._param_map['compression_level']) < 0 or int(self._param_map['compression_level']) > 22:
+            print ('Compression level can be from 0 - 22')
             return False
 
         if self._param_map['keep_dark_data'] not in [0,1]:
