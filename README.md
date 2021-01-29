@@ -1,3 +1,8 @@
+## :warning: Deprecated
+This repository is deprecated in favor of [pyReCoDe](https://github.com/NDLOHGRP/pyReCoDe)   
+Please check out pyReCoDe to see the latest developments.
+
+
 # ReCoDe
 A Reduced Compressed Description for Direct Electron Microscopy Data
 
